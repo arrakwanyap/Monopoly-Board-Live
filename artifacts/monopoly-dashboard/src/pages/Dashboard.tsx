@@ -13,7 +13,7 @@ export default function Dashboard() {
 
   const statusColor = {
     lobby: "#f7941d",
-    active: "#1fb25a",
+    active: "#2563eb",
     finished: "#ed1b24",
   }[gameState?.status ?? "lobby"] ?? "#7f8c8d";
 
@@ -27,12 +27,12 @@ export default function Dashboard() {
         <div className="flex items-center gap-3">
           <div
             className="w-8 h-8 rounded flex items-center justify-center font-black text-sm"
-            style={{ backgroundColor: "#1fb25a", color: "#fff" }}
+            style={{ backgroundColor: "#2563eb", color: "#fff" }}
           >
             M
           </div>
           <div>
-            <div className="font-black text-base leading-tight" style={{ color: "#1fb25a" }}>
+            <div className="font-black text-base leading-tight" style={{ color: "#3b82f6" }}>
               YCIS MONOPOLY 2026
             </div>
             <div className="text-xs text-muted-foreground tracking-widest uppercase">
@@ -58,7 +58,7 @@ export default function Dashboard() {
           <a
             href="/admin"
             className="px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition-opacity hover:opacity-80"
-            style={{ backgroundColor: "#1fb25a", color: "#fff" }}
+            style={{ backgroundColor: "#2563eb", color: "#fff" }}
           >
             Admin
           </a>
@@ -112,7 +112,7 @@ export default function Dashboard() {
             <div className="flex items-center gap-2 mb-2">
               <div
                 className="w-1 h-4 rounded-full animate-pulse"
-                style={{ backgroundColor: "#1fb25a" }}
+                style={{ backgroundColor: "#3b82f6" }}
               />
               <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
                 Live Event Feed

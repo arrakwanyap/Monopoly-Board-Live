@@ -217,12 +217,12 @@ export default function Admin() {
         <div className="flex items-center gap-3">
           <div
             className="w-8 h-8 rounded flex items-center justify-center font-black text-sm"
-            style={{ backgroundColor: "#1fb25a", color: "#fff" }}
+            style={{ backgroundColor: "#2563eb", color: "#fff" }}
           >
             M
           </div>
           <div>
-            <div className="font-black text-base leading-tight" style={{ color: "#1fb25a" }}>
+            <div className="font-black text-base leading-tight" style={{ color: "#3b82f6" }}>
               YCIS MONOPOLY 2026
             </div>
             <div className="text-xs text-muted-foreground tracking-widest uppercase">
@@ -257,7 +257,7 @@ export default function Admin() {
             </Field>
             <button
               className={btnPrimary}
-              style={{ backgroundColor: "#1fb25a" }}
+              style={{ backgroundColor: "#2563eb" }}
               onClick={handleMove}
               disabled={!moveTeamId || updateTeam.isPending}
             >
@@ -287,7 +287,7 @@ export default function Admin() {
             <div className="flex gap-2">
               <button
                 className={btnPrimary + " flex-1"}
-                style={{ backgroundColor: "#1fb25a" }}
+                style={{ backgroundColor: "#2563eb" }}
                 onClick={() => handleCash(true)}
                 disabled={!cashTeamId}
               >
@@ -342,7 +342,7 @@ export default function Admin() {
             </label>
             <button
               className={btnPrimary}
-              style={{ backgroundColor: "#f7941d" }}
+              style={{ backgroundColor: "#2563eb" }}
               onClick={handleSetOwnership}
               disabled={!propSpaceId || setOwnership.isPending}
             >
@@ -442,7 +442,7 @@ export default function Admin() {
               </Field>
               <button
                 className={btnPrimary}
-                style={{ backgroundColor: "#1fb25a" }}
+                style={{ backgroundColor: "#2563eb" }}
                 onClick={handleCreateTeam}
                 disabled={!newTeamName.trim() || createTeam.isPending}
               >

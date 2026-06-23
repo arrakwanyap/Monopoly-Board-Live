@@ -72,7 +72,7 @@ export default function EventFeed({ events, isLoading }: Props) {
                 {event.amount && (
                   <span
                     className="text-xs font-bold"
-                    style={{ color: event.amount > 0 ? "#1fb25a" : "#ed1b24" }}
+                    style={{ color: event.amount > 0 ? "#60a5fa" : "#ed1b24" }}
                   >
                     {event.amount > 0 ? `+$${event.amount}` : `-$${Math.abs(event.amount)}`}
                   </span>
