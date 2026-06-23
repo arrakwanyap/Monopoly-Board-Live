@@ -7,31 +7,41 @@ interface Props {
   teams: Team[];
 }
 
-// Maps board position → [row, col] in an 11×11 grid (0-indexed, top-left = [0,0])
 function getGridPos(position: number): [number, number] {
-  if (position === 0)  return [10, 10]; // GO — bottom-right
-  if (position >= 1  && position <= 9)  return [10, 10 - position]; // bottom row, right→left
-  if (position === 10) return [10, 0];  // Jail — bottom-left
-  if (position >= 11 && position <= 19) return [10 - (position - 10), 0]; // left col, bottom→top
-  if (position === 20) return [0, 0];   // Free Parking — top-left
-  if (position >= 21 && position <= 29) return [0, position - 20]; // top row, left→right
-  if (position === 30) return [0, 10];  // Go To Jail — top-right
-  if (position >= 31 && position <= 39) return [position - 30, 10]; // right col, top→bottom
+  if (position === 0)  return [10, 10];
+  if (position >= 1  && position <= 9)  return [10, 10 - position];
+  if (position === 10) return [10, 0];
+  if (position >= 11 && position <= 19) return [10 - (position - 10), 0];
+  if (position === 20) return [0, 0];
+  if (position >= 21 && position <= 29) return [0, position - 20];
+  if (position === 30) return [0, 10];
+  if (position >= 31 && position <= 39) return [position - 30, 10];
   return [5, 5];
 }
 
-// Cell center positions as percentages of board width/height.
-// Corners ≈ 11%, regular cells ≈ 8.67% of board width each (2*11 + 9*8.67 = 100).
 const CORNER = 11;
-const CELL = (100 - 2 * CORNER) / 9; // ≈ 8.667%
+const CELL = (100 - 2 * CORNER) / 9;
+
 const CELL_CENTERS: number[] = [
-  CORNER / 2,                          // col/row 0  — left corner
-  ...Array.from({ length: 9 }, (_, i) => CORNER + CELL * i + CELL / 2), // cols/rows 1-9
-  CORNER + CELL * 9 + CORNER / 2,      // col/row 10 — right corner
+  CORNER / 2,
+  ...Array.from({ length: 9 }, (_, i) => CORNER + CELL * i + CELL / 2),
+  CORNER + CELL * 9 + CORNER / 2,
 ];
 
+function getCellBounds(row: number, col: number) {
+  let left: number, width: number, top: number, height: number;
+  if (col === 0)       { left = 0;              width = CORNER; }
+  else if (col === 10) { left = 100 - CORNER;   width = CORNER; }
+  else                 { left = CORNER + (col - 1) * CELL; width = CELL; }
+
+  if (row === 0)       { top = 0;              height = CORNER; }
+  else if (row === 10) { top = 100 - CORNER;   height = CORNER; }
+  else                 { top = CORNER + (row - 1) * CELL; height = CELL; }
+
+  return { left, top, width, height };
+}
+
 export default function MonopolyBoard({ spaces, teams }: Props) {
-  // Group teams by board position
   const teamsByPosition = useMemo(() => {
     const map: Record<number, Team[]> = {};
     for (const t of teams) {
@@ -40,15 +50,13 @@ export default function MonopolyBoard({ spaces, teams }: Props) {
     return map;
   }, [teams]);
 
-  // Owned spaces for ownership overlays
-  const ownedSpaces = useMemo(
-    () => spaces.filter((s) => s.ownerId && s.type === "property"),
+  const propertySpaces = useMemo(
+    () => spaces.filter((s) => s.type === "property"),
     [spaces],
   );
 
   return (
     <div style={{ position: "relative", width: "100%", aspectRatio: "1 / 1" }}>
-      {/* Actual board image — matches the Figma design exactly */}
       <img
         src="/board.png"
         alt="YCIS Monopoly Board"
@@ -56,47 +64,61 @@ export default function MonopolyBoard({ spaces, teams }: Props) {
         draggable={false}
       />
 
-      {/* Overlay container — covers the board image */}
       <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
 
-        {/* ── Ownership dots ──────────────────────────────────────────────── */}
-        {ownedSpaces.map((space) => {
+        {/* ── Property frames: team landed on this space ──────────────────── */}
+        {propertySpaces.map((space) => {
+          const teamsHere = teamsByPosition[space.position] ?? [];
+          if (teamsHere.length === 0) return null;
+
           const [row, col] = getGridPos(space.position);
-          const cx = CELL_CENTERS[col];
-          const cy = CELL_CENTERS[row];
-
-          // Place the dot toward the outer edge of the space
-          const isBottom = space.position >= 1  && space.position <= 9;
-          const isLeft   = space.position >= 11 && space.position <= 19;
-          const isTop    = space.position >= 21 && space.position <= 29;
-          const isRight  = space.position >= 31 && space.position <= 39;
-
-          const BAND = CELL * 0.32; // roughly matches the color-band depth
-          const dx = isLeft ? -BAND / 2 : isRight ? BAND / 2 : 0;
-          const dy = isBottom ? BAND / 2 : isTop ? -BAND / 2 : 0;
+          const { left, top, width, height } = getCellBounds(row, col);
+          const color = teamsHere[0].color;
 
           return (
             <div
-              key={`owner-${space.id}`}
-              title={`Owned by ${space.ownerName ?? "?"}`}
+              key={`frame-${space.id}`}
               style={{
                 position: "absolute",
-                left: `${cx + dx}%`,
-                top: `${cy + dy}%`,
-                transform: "translate(-50%, -50%)",
-                width: "9px",
-                height: "9px",
-                borderRadius: "50%",
-                backgroundColor: space.ownerColor ?? "#fff",
-                border: "1.5px solid rgba(255,255,255,0.9)",
-                boxShadow: "0 1px 3px rgba(0,0,0,0.7)",
-                zIndex: 10,
+                left: `${left}%`,
+                top: `${top}%`,
+                width: `${width}%`,
+                height: `${height}%`,
+                boxShadow: `inset 0 0 0 3px ${color}, inset 0 0 0 5px rgba(255,255,255,0.25)`,
+                zIndex: 8,
               }}
             />
           );
         })}
 
-        {/* ── Hotel indicators ────────────────────────────────────────────── */}
+        {/* ── Owner token: top-left corner of property tile ───────────────── */}
+        {propertySpaces.filter((s) => s.ownerId && (s as any).ownerEmoji).map((space) => {
+          const [row, col] = getGridPos(space.position);
+          const { left, top } = getCellBounds(row, col);
+
+          return (
+            <div
+              key={`owner-token-${space.id}`}
+              title={`Owned by ${space.ownerName ?? "?"}`}
+              style={{
+                position: "absolute",
+                left: `${left + 0.25}%`,
+                top: `${top + 0.25}%`,
+                zIndex: 12,
+                filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.8))",
+              }}
+            >
+              <TeamToken
+                emoji={(space as any).ownerEmoji as string}
+                name={space.ownerName ?? ""}
+                size={14}
+                style={{ display: "block" }}
+              />
+            </div>
+          );
+        })}
+
+        {/* ── Hotel indicators ─────────────────────────────────────────────── */}
         {spaces.filter((s) => s.hasHotel).map((space) => {
           const [row, col] = getGridPos(space.position);
           const cx = CELL_CENTERS[col];
@@ -122,7 +144,7 @@ export default function MonopolyBoard({ spaces, teams }: Props) {
           );
         })}
 
-        {/* ── Team tokens ─────────────────────────────────────────────────── */}
+        {/* ── Team tokens ──────────────────────────────────────────────────── */}
         {Object.entries(teamsByPosition).map(([posStr, teamsHere]) => {
           const position = parseInt(posStr, 10);
           const [row, col] = getGridPos(position);
@@ -130,13 +152,12 @@ export default function MonopolyBoard({ spaces, teams }: Props) {
           const cy = CELL_CENTERS[row];
 
           return teamsHere.map((team, idx) => {
-            // Spread tokens in a small cluster when multiple teams share a space
             const total = teamsHere.length;
             let offsetX = 0;
             let offsetY = 0;
             if (total > 1) {
               const angle = (idx / total) * 2 * Math.PI - Math.PI / 2;
-              const radius = total <= 3 ? 1.5 : 2.2; // % of board width
+              const radius = total <= 3 ? 1.5 : 2.2;
               offsetX = Math.cos(angle) * radius;
               offsetY = Math.sin(angle) * radius;
             }
