@@ -1,4 +1,5 @@
 import type { LeaderboardEntry } from "@workspace/api-client-react";
+import TeamToken from "@/components/TeamToken";
 
 interface Props {
   entries: LeaderboardEntry[];
@@ -43,9 +44,9 @@ export default function LeaderboardPanel({ entries, isLoading }: Props) {
               #{entry.rank}
             </div>
 
-            {/* Team emoji + color dot */}
+            {/* Team token + color dot */}
             <div className="relative shrink-0">
-              <span className="text-xl leading-none">{entry.teamEmoji}</span>
+              <TeamToken emoji={entry.teamEmoji} name={entry.teamName} size={32} />
               <div
                 className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border border-border"
                 style={{ backgroundColor: entry.teamColor }}

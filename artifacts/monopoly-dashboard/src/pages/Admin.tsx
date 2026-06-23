@@ -1,4 +1,5 @@
 import { useState } from "react";
+import TeamToken from "@/components/TeamToken";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   useListTeams,
@@ -246,7 +247,7 @@ export default function Admin() {
             <Field label="Team">
               <select className={selectClass} value={moveTeamId} onChange={e => setMoveTeamId(e.target.value)}>
                 <option value="">Select team...</option>
-                {teams?.map(t => <option key={t.id} value={t.id}>{t.emoji} {t.name} (pos {t.position})</option>)}
+                {teams?.map(t => <option key={t.id} value={t.id}>{t.name} (pos {t.position})</option>)}
               </select>
             </Field>
             <Field label="Board Position (0-39)">
@@ -271,7 +272,7 @@ export default function Admin() {
             <Field label="Team">
               <select className={selectClass} value={cashTeamId} onChange={e => setCashTeamId(e.target.value)}>
                 <option value="">Select team...</option>
-                {teams?.map(t => <option key={t.id} value={t.id}>{t.emoji} {t.name} (${t.cash})</option>)}
+                {teams?.map(t => <option key={t.id} value={t.id}>{t.name} (${t.cash})</option>)}
               </select>
             </Field>
             <Field label="Amount ($)">
@@ -327,7 +328,7 @@ export default function Admin() {
             <Field label="Owner">
               <select className={selectClass} value={propTeamId} onChange={e => setPropTeamId(e.target.value)}>
                 <option value="">None (unowned)</option>
-                {teams?.map(t => <option key={t.id} value={t.id}>{t.emoji} {t.name}</option>)}
+                {teams?.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
               </select>
             </Field>
             <label className="flex items-center gap-2 text-sm text-foreground cursor-pointer">
@@ -370,7 +371,7 @@ export default function Admin() {
             <Field label="Team (optional)">
               <select className={selectClass} value={eventTeamId} onChange={e => setEventTeamId(e.target.value)}>
                 <option value="">No team</option>
-                {teams?.map(t => <option key={t.id} value={t.id}>{t.emoji} {t.name}</option>)}
+                {teams?.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
               </select>
             </Field>
             <Field label="Amount (optional, negative for penalty)">
@@ -456,7 +457,7 @@ export default function Admin() {
                 <div className="flex flex-col gap-1.5">
                   {teams.map(t => (
                     <div key={t.id} className="flex items-center gap-2 text-sm">
-                      <span className="text-base">{t.emoji}</span>
+                      <TeamToken emoji={t.emoji} name={t.name} size={24} />
                       <div
                         className="w-3 h-3 rounded-full shrink-0"
                         style={{ backgroundColor: t.color }}

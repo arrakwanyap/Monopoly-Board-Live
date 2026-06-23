@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import type { BoardSpace, Team } from "@workspace/api-client-react";
+import TeamToken from "@/components/TeamToken";
 
 interface Props {
   spaces: BoardSpace[];
@@ -149,14 +150,17 @@ export default function MonopolyBoard({ spaces, teams }: Props) {
                   left: `${cx + offsetX}%`,
                   top: `${cy + offsetY}%`,
                   transform: "translate(-50%, -50%)",
-                  fontSize: "clamp(14px, 2.2vw, 22px)",
-                  lineHeight: 1,
-                  filter: "drop-shadow(0 1px 3px rgba(0,0,0,0.9)) drop-shadow(0 0 6px rgba(255,255,255,0.6))",
                   zIndex: 20,
                   cursor: "default",
+                  filter: "drop-shadow(0 1px 4px rgba(0,0,0,0.85))",
                 }}
               >
-                {team.emoji}
+                <TeamToken
+                  emoji={team.emoji}
+                  name={team.name}
+                  size={Math.round(window.innerWidth * 0.034)}
+                  style={{ display: "block" }}
+                />
               </div>
             );
           });

@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import type { GameEvent } from "@workspace/api-client-react";
+import TeamToken from "@/components/TeamToken";
 import { EVENT_TYPE_COLOR, EVENT_TYPE_LABEL } from "@/lib/constants";
 
 interface Props {
@@ -57,7 +58,7 @@ export default function EventFeed({ events, isLoading }: Props) {
               {/* Team + type tag */}
               <div className="flex items-center gap-1.5 flex-wrap">
                 {event.teamEmoji && (
-                  <span className="text-sm leading-none">{event.teamEmoji}</span>
+                  <TeamToken emoji={event.teamEmoji} name={event.teamName ?? ""} size={18} />
                 )}
                 {event.teamName && (
                   <span className="text-xs font-bold text-foreground">{event.teamName}</span>
