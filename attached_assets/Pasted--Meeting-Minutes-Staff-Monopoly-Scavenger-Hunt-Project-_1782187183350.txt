@@ -1,0 +1,45 @@
+# 📋 Meeting Minutes: Staff Monopoly Scavenger Hunt Project
+
+## 🎯 Objective
+
+To design a friction-free, interactive real-time game based on Monopoly mechanics to help new staff explore the school, build familiarity with key locations, and encourage team collaboration while mitigating physical fatigue.
+
+## 🎲 1. Core Gameplay & Baseline Mechanics
+
+- **The Goal:** Teams win by accumulating the highest total value at the end of the game (Calculated as: **Remaining Cash + Property Values + Full-Set Bonuses**).
+- **Starting Point:** All teams start at the **GLC** but will be sent to different corners of the board/school at launch to prevent bottlenecks.
+- **Team Size:** Target a maximum of **8 teams** (ideally 5–6 people per team) to keep the logistical tracking manageable.
+- **Movement:** Teams roll a dice to move from location to location.
+- **Friction-Free Submissions:** Submissions will be done purely via **WhatsApp**. Teams take a photo/video or answer a text prompt and message it to the coordinators.
+    - *Why WhatsApp?* Microsoft/Google forms require opening links repeatedly, and video file sizes often cause hiccups on form uploads.
+- **Alleviating Fatigue:** To prevent staff from constantly walking back to a single central hub, there will be **two physical dice-rolling locations** (e.g., GLC and another mid-level/podium location connecting Blocks A & B).
+    - giant blow-up or foam dice to make the physical rolling fun.
+
+## 🔄 2. Board Layout & Property Values
+
+- **Locations:** The board will consist of a mix of traditional rooms and school landmarks (e.g., the gym, CCDD, vending machines, lost & found, or the back entrance guard booth).
+- **No Purchase Cost:** To eliminate calculation friction, **properties do not cost money to buy**. Ownership is granted automatically upon the fastest, successful completion of a location's challenge.
+- **Property Value & Rent:**
+    - Properties will use traditional Monopoly color-coding to easily communicate value (e.g., Dark Blues are the most expensive/highest rent, Light Browns/Blues are lower).
+    - Rent values for each color tier will be fixed (e.g., all Dark Blues pay $400 rent).
+    - **Monopoly Set Bonus:** Owning a full color set grants a point/cash bonus at the end of the game.
+
+## 🗺️ 3. Real-Time Tech Infrastructure (The "Live Map")
+
+- **Platform:** A **Canva Presentation** shared via an **Audience Link** (viewing permissions only). Staff will access it via a QR code provided in their team kits.
+- **Real-time Updates:** Coordinators will update the Canva slides in real time from the backend.
+    - **Slide 1:** The Live Map (showing property ownership via team icons and live digital tokens tracking where each team is currently located).
+    - **Slide 2:** The Live Leaderboard.
+    - **Slide 3:** A breakdown of properties owned by each group.
+- **Hardware:** Having **iPads** for teams to view the live map would be highly preferable over tiny phone screens to easily check room occupancy.
+
+## ⚖️ 4. Gameplay Logic & Scenarios
+
+| **Scenario** | **What Happens / What Teams Do** |
+| --- | --- |
+| **1. Lands on Unoccupied Space** | Teams go to the room, open the physical challenge envelope (branded in Monopoly style), complete it, and send proof via WhatsApp. Fastest team to submit takes ownership. |
+| **2. Lands on an Occupied Space** | Teams must still go to the location and complete a challenge (to build familiarity with the space). Upon returning to a dice station, they must **spin a physical/digital wheel** managed by coordinators. |
+| • *Outcomes:* 50/50 chance to either **Pay Rent** to the owner or **Take Over** the property. |  |
+| **3. Lands on a Previously Held Space** | If a team lands on a property they used to own but lost, they can optionally take on a "Take Back Challenge" to earn a 50/50 wheel spin to reclaim it or pay rent. |
+| **4. Lands on their Own Space** | They do not need to walk to the room. They can stay at the dice station, **rent increases (hotel built)**, and they immediately roll again. |
+| **5. Chance / Community Chest** | Spaces that give teams a break from walking. They can win or lose virtual money based on funny school-related prompts (e.g., *"Won a school singing competition: collect $150"*). |

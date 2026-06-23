@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "YCIS Monopoly 2026"
+version = "1.0.0"
+id = "artifacts/monopoly-dashboard"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 23522
+
+[services.development]
+run = "pnpm --filter @workspace/monopoly-dashboard run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/monopoly-dashboard", "run", "build" ]
+publicDir = "artifacts/monopoly-dashboard/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23522"
+BASE_PATH = "/"

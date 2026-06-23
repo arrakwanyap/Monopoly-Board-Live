@@ -1,22 +1,31 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: YCIS Monopoly 2026 Game Dashboard API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: teams
+    description: Team management
+  - name: board
+    description: Board spaces and layout
+  - name: ownership
+    description: Property ownership
+  - name: events
+    description: Game event feed
+  - name: game
+    description: Game state and control
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +33,410 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /teams:
+    get:
+      operationId: listTeams
+      tags: [teams]
+      summary: List all teams with stats
+      responses:
+        "200":
+          description: List of teams
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Team"
+    post:
+      operationId: createTeam
+      tags: [teams]
+      summary: Create a new team
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TeamInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Team"
+
+  /teams/{id}:
+    get:
+      operationId: getTeam
+      tags: [teams]
+      summary: Get a team by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Team found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Team"
+    patch:
+      operationId: updateTeam
+      tags: [teams]
+      summary: Update team (position, cash, etc.)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TeamUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Team"
+    delete:
+      operationId: deleteTeam
+      tags: [teams]
+      summary: Delete a team
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /board:
+    get:
+      operationId: getBoard
+      tags: [board]
+      summary: Get all board spaces with ownership info
+      responses:
+        "200":
+          description: Board spaces
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BoardSpace"
+
+  /board/{id}/ownership:
+    put:
+      operationId: setBoardSpaceOwnership
+      tags: [ownership]
+      summary: Set ownership of a board space
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OwnershipUpdate"
+      responses:
+        "200":
+          description: Updated space
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BoardSpace"
+
+  /events:
+    get:
+      operationId: listEvents
+      tags: [events]
+      summary: Get recent game events
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 30
+      responses:
+        "200":
+          description: Recent events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GameEvent"
+    post:
+      operationId: createEvent
+      tags: [events]
+      summary: Post a new game event
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GameEventInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GameEvent"
+
+  /game/state:
+    get:
+      operationId: getGameState
+      tags: [game]
+      summary: Get full game state (teams + board + events)
+      responses:
+        "200":
+          description: Full game state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GameState"
+
+  /game/leaderboard:
+    get:
+      operationId: getLeaderboard
+      tags: [game]
+      summary: Get ranked leaderboard with net worth
+      responses:
+        "200":
+          description: Leaderboard
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LeaderboardEntry"
+
+  /game/reset:
+    post:
+      operationId: resetGame
+      tags: [game]
+      summary: Reset the game to initial state
+      responses:
+        "200":
+          description: Game reset
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResetResult"
+
 components:
   schemas:
     HealthStatus:
       type: object
+      required: [status]
       properties:
         status:
           type: string
-      required:
-        - status
 
+    Team:
+      type: object
+      required: [id, name, cash, position, color, emoji, netWorth, propertyCount]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        cash:
+          type: integer
+        position:
+          type: integer
+          description: Board space index (0-39)
+        color:
+          type: string
+          description: Hex color code for team token
+        emoji:
+          type: string
+          description: Team emoji avatar
+        netWorth:
+          type: integer
+          description: Cash + property values + set bonuses
+        propertyCount:
+          type: integer
+        createdAt:
+          type: string
+
+    TeamInput:
+      type: object
+      required: [name, color, emoji]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        cash:
+          type: integer
+          default: 1500
+        position:
+          type: integer
+          default: 0
+        color:
+          type: string
+        emoji:
+          type: string
+
+    TeamUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        cash:
+          type: integer
+        position:
+          type: integer
+        color:
+          type: string
+        emoji:
+          type: string
+
+    BoardSpace:
+      type: object
+      required: [id, name, type, position, colorGroup, rentValue, propertyValue]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        type:
+          type: string
+          enum: [property, chance, community_chest, tax, corner, dice_station]
+        position:
+          type: integer
+        colorGroup:
+          type: ["string", "null"]
+          description: Monopoly color group (e.g. dark_blue, green)
+        rentValue:
+          type: integer
+        propertyValue:
+          type: integer
+        hasHotel:
+          type: boolean
+        ownerId:
+          type: ["integer", "null"]
+          description: Team ID of the owner, null if unowned
+        ownerName:
+          type: ["string", "null"]
+        ownerColor:
+          type: ["string", "null"]
+        ownerEmoji:
+          type: ["string", "null"]
+
+    OwnershipUpdate:
+      type: object
+      properties:
+        ownerId:
+          type: ["integer", "null"]
+        hasHotel:
+          type: boolean
+
+    GameEvent:
+      type: object
+      required: [id, message, type, createdAt]
+      properties:
+        id:
+          type: integer
+        message:
+          type: string
+        type:
+          type: string
+          enum: [property_taken, rent_paid, takeover, chance, community_chest, hotel_built, cash_change, system]
+        teamId:
+          type: ["integer", "null"]
+        teamName:
+          type: ["string", "null"]
+        teamEmoji:
+          type: ["string", "null"]
+        amount:
+          type: ["integer", "null"]
+        createdAt:
+          type: string
+
+    GameEventInput:
+      type: object
+      required: [message, type]
+      properties:
+        message:
+          type: string
+          minLength: 1
+        type:
+          type: string
+          enum: [property_taken, rent_paid, takeover, chance, community_chest, hotel_built, cash_change, system]
+        teamId:
+          type: ["integer", "null"]
+        amount:
+          type: ["integer", "null"]
+
+    GameState:
+      type: object
+      required: [teams, board, recentEvents, round, status]
+      properties:
+        teams:
+          type: array
+          items:
+            $ref: "#/components/schemas/Team"
+        board:
+          type: array
+          items:
+            $ref: "#/components/schemas/BoardSpace"
+        recentEvents:
+          type: array
+          items:
+            $ref: "#/components/schemas/GameEvent"
+        round:
+          type: integer
+        status:
+          type: string
+          enum: [lobby, active, finished]
+
+    LeaderboardEntry:
+      type: object
+      required: [rank, teamId, teamName, teamEmoji, teamColor, cash, propertyValue, setBonus, netWorth, propertyCount]
+      properties:
+        rank:
+          type: integer
+        teamId:
+          type: integer
+        teamName:
+          type: string
+        teamEmoji:
+          type: string
+        teamColor:
+          type: string
+        cash:
+          type: integer
+        propertyValue:
+          type: integer
+        setBonus:
+          type: integer
+        netWorth:
+          type: integer
+        propertyCount:
+          type: integer
+
+    ResetResult:
+      type: object
+      required: [success, message]
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
