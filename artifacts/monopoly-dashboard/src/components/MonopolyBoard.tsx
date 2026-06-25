@@ -9,59 +9,62 @@ interface Props {
 }
 
 // ── Board geometry ─────────────────────────────────────────────────────────
-// board.png is 1152×1152 px: 2×180 + 9×88 = 1152 exactly.
+// board.png = 1152×1152: 2×180 + 9×88 = 1152 px
 const CORNER = (180 / 1152) * 100; // 15.625 %
-const CELL   = (88  / 1152) * 100; // 7.639  %
-// Same values as cqi units (board is square, 100cqi = board width = board height)
+const CELL   = (88  / 1152) * 100; //  7.639 %
+// cqi equivalents (board is square, containerType:inline-size → 100cqi = board side)
 const CQI_CORNER = 15.625;
 const CQI_CELL   = 7.639;
 
-// Centre position for each 11-element axis (col 0‥10 or row 0‥10)
+// Centre of each 11-slot axis (0 = corner, 1-9 = cells, 10 = corner)
 const AXIS_CENTERS: number[] = [
   CORNER / 2,
   ...Array.from({ length: 9 }, (_, i) => CORNER + CELL * i + CELL / 2),
   CORNER + 9 * CELL + CORNER / 2,
 ];
 
-// ── Grid mapping ───────────────────────────────────────────────────────────
+// ── Grid helpers ───────────────────────────────────────────────────────────
 function getGridPos(position: number): [number, number] {
   if (position === 0)                    return [10, 10];
   if (position >= 1  && position <= 9)   return [10, 10 - position];
-  if (position === 10)                   return [10, 0];
+  if (position === 10)                   return [10,  0];
   if (position >= 11 && position <= 19)  return [10 - (position - 10), 0];
-  if (position === 20)                   return [0, 0];
-  if (position >= 21 && position <= 29)  return [0, position - 20];
-  if (position === 30)                   return [0, 10];
+  if (position === 20)                   return [ 0,  0];
+  if (position >= 21 && position <= 29)  return [ 0, position - 20];
+  if (position === 30)                   return [ 0, 10];
   if (position >= 31 && position <= 39)  return [position - 30, 10];
   return [5, 5];
 }
 
 function getCellBounds(row: number, col: number) {
   const left   = col === 0  ? 0 : col === 10 ? 100 - CORNER : CORNER + (col  - 1) * CELL;
-  const width  = col === 0 || col === 10 ? CORNER : CELL;
+  const width  = (col === 0 || col === 10) ? CORNER : CELL;
   const top    = row === 0  ? 0 : row === 10 ? 100 - CORNER : CORNER + (row  - 1) * CELL;
-  const height = row === 0 || row === 10 ? CORNER : CELL;
+  const height = (row === 0 || row === 10) ? CORNER : CELL;
   return { left, top, width, height };
 }
 
-// Natural rotation for each board section (band is always rendered at the "bottom"
-// of the inner content div, and the whole thing is rotated to put it at the board edge).
-// Bottom row → 0°   Left column → −90°   Top row → 180°   Right column → 90°
+// Natural orientation: band at bottom, text above.
+// Rotation puts the band at the board outer edge.
+//   Bottom row → 0°    (band stays at bottom = south edge)
+//   Left column → +90° CW  (bottom → left = west edge)
+//   Top row → 180°          (bottom → top = north edge)
+//   Right column → −90° CCW (bottom → right = east edge)
 function getTileRotation(position: number): 0 | 90 | 180 | -90 {
   if ([0, 10, 20, 30].includes(position)) return 0;
   if (position >= 1  && position <= 9)    return 0;
-  if (position >= 11 && position <= 19)   return -90;
+  if (position >= 11 && position <= 19)   return 90;   // left col: CW → band goes left
   if (position >= 21 && position <= 29)   return 180;
-  if (position >= 31 && position <= 39)   return 90;
+  if (position >= 31 && position <= 39)   return -90;  // right col: CCW → band goes right
   return 0;
 }
 
-// ── Tile content renderers ─────────────────────────────────────────────────
-const TILE_BORDER = "1px solid #222";
+// ── Shared style constants ─────────────────────────────────────────────────
 const TILE_BG     = "#ffffff";
+const TILE_BORDER = "1px solid #333";
 
-// Natural layout: info area (top flex-1) + colour band (bottom, fixed height).
-// The whole inner div is rotated by parent to face the correct board edge.
+// ── Tile content components (natural orientation: band at bottom) ──────────
+
 function PropertyContent({
   name,
   colorGroup,
@@ -72,6 +75,10 @@ function PropertyContent({
   price: number;
 }) {
   const bandColor = COLOR_GROUP_HEX[colorGroup] ?? "#ccc";
+  // Use dark text on light bands, white on dark bands
+  const lightBands = new Set(["light_blue", "yellow", "orange"]);
+  const bandText = lightBands.has(colorGroup) ? "#111" : "#fff";
+
   return (
     <div
       style={{
@@ -83,7 +90,7 @@ function PropertyContent({
         overflow: "hidden",
       }}
     >
-      {/* text area */}
+      {/* Info area */}
       <div
         style={{
           flex: 1,
@@ -91,10 +98,10 @@ function PropertyContent({
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          padding: "0.3cqi 0.2cqi",
+          padding: "0.25cqi 0.2cqi",
           textAlign: "center",
           overflow: "hidden",
-          gap: "0.15cqi",
+          gap: "0.1cqi",
         }}
       >
         <span
@@ -109,17 +116,25 @@ function PropertyContent({
         >
           {name}
         </span>
-        <span style={{ fontSize: "1.05cqi", color: "#333" }}>M{price}</span>
+        <span style={{ fontSize: "1.05cqi", color: "#444", fontWeight: 500 }}>
+          M{price}
+        </span>
       </div>
-      {/* colour band – bottom 22 % of the natural height */}
+      {/* Colour band – at the "bottom" of natural orientation */}
       <div
         style={{
           height: "22%",
           backgroundColor: bandColor,
           flexShrink: 0,
-          border: "none",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
-      />
+      >
+        <span style={{ fontSize: "0.7cqi", color: bandText, fontWeight: 600, letterSpacing: "0.03em" }}>
+          RENT M{Math.round(price * 0.1)}
+        </span>
+      </div>
     </div>
   );
 }
@@ -130,16 +145,34 @@ function ChanceContent() {
       style={{
         width: "100%",
         height: "100%",
-        backgroundColor: TILE_BG,
+        backgroundColor: "#fff8f0",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
         gap: "0.3cqi",
+        border: "none",
       }}
     >
-      <span style={{ fontSize: "4.5cqi", color: "#d93a96", fontWeight: 900, lineHeight: 1 }}>?</span>
-      <span style={{ fontSize: "1.0cqi", fontWeight: 700, letterSpacing: "0.05em", color: "#333" }}>
+      <span
+        style={{
+          fontSize: "5cqi",
+          color: "#d93a96",
+          fontWeight: 900,
+          lineHeight: 1,
+          fontFamily: "serif",
+        }}
+      >
+        ?
+      </span>
+      <span
+        style={{
+          fontSize: "0.95cqi",
+          fontWeight: 700,
+          color: "#d93a96",
+          letterSpacing: "0.1em",
+        }}
+      >
         CHANCE
       </span>
     </div>
@@ -152,22 +185,22 @@ function CommunityChestContent({ name }: { name: string }) {
       style={{
         width: "100%",
         height: "100%",
-        backgroundColor: "#fffbea",
+        backgroundColor: "#fff9e6",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
         gap: "0.3cqi",
-        padding: "0.5cqi",
+        padding: "0.4cqi",
       }}
     >
-      <span style={{ fontSize: "3cqi", lineHeight: 1 }}>🏆</span>
+      <span style={{ fontSize: "3.2cqi", lineHeight: 1 }}>🎁</span>
       <span
         style={{
-          fontSize: "0.95cqi",
+          fontSize: "0.9cqi",
           fontWeight: 700,
           textAlign: "center",
-          color: "#333",
+          color: "#b8860b",
           lineHeight: 1.2,
         }}
       >
@@ -183,16 +216,16 @@ function TaxContent({ name }: { name: string }) {
       style={{
         width: "100%",
         height: "100%",
-        backgroundColor: TILE_BG,
+        backgroundColor: "#fff",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        gap: "0.3cqi",
-        padding: "0.5cqi",
+        gap: "0.25cqi",
+        padding: "0.4cqi",
       }}
     >
-      <span style={{ fontSize: "3cqi", lineHeight: 1 }}>💸</span>
+      <span style={{ fontSize: "2.8cqi", lineHeight: 1 }}>💰</span>
       <span
         style={{
           fontSize: "0.9cqi",
@@ -208,30 +241,30 @@ function TaxContent({ name }: { name: string }) {
   );
 }
 
-function DiceStationContent({ name }: { name: string }) {
-  // Strip "(Dice Station)" from name for display
+// GLC, Podium, ELW Trip, School Supplies — look like simple station tiles
+function StationContent({ name }: { name: string }) {
   const label = name.replace(/\s*\(Dice Station\)/i, "").trim();
   return (
     <div
       style={{
         width: "100%",
         height: "100%",
-        backgroundColor: "#eaf4ff",
+        backgroundColor: "#fff",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
         gap: "0.3cqi",
-        padding: "0.5cqi",
+        padding: "0.4cqi",
       }}
     >
-      <span style={{ fontSize: "3cqi", lineHeight: 1 }}>🎲</span>
+      <span style={{ fontSize: "2.8cqi", lineHeight: 1 }}>🎲</span>
       <span
         style={{
-          fontSize: "0.9cqi",
+          fontSize: "0.95cqi",
           fontWeight: 700,
           textAlign: "center",
-          color: "#1a4a8a",
+          color: "#1a3a6b",
           lineHeight: 1.2,
         }}
       >
@@ -241,45 +274,28 @@ function DiceStationContent({ name }: { name: string }) {
   );
 }
 
-// Corner tiles: clip board.png to show just that corner.
-// board.png = 1152×1152 px; each corner = 180px.
-// img dims: 1152/180 = 640% of corner tile; offsets use the same ratio.
-const CORNER_SCALE = (1152 / 180) * 100; // 640 %
-const CORNER_OFFSET = (972 / 180) * 100; // 540 % (= 1152-180 / 180 * 100)
+// Corner tiles — use individually pre-cropped images (no CSS clipping)
+const CORNER_IMAGES: Record<number, string> = {
+   0: "/corner_go.png",
+  10: "/corner_jail.png",
+  20: "/corner_free_parking.png",
+  30: "/corner_go_to_jail.png",
+};
 
 function CornerContent({ position }: { position: number }) {
-  let imgLeft = "0%";
-  let imgTop  = "0%";
-
-  // pos 20 = Free Parking (top-left):  x=0,   y=0   → no offset
-  // pos 30 = Go To Jail (top-right):   x=972, y=0   → left=-540%, top=0%
-  // pos 10 = Jail (bottom-left):       x=0,   y=972 → left=0%,   top=-540%
-  // pos  0 = GO (bottom-right):        x=972, y=972 → left=-540%, top=-540%
-  if (position === 30 || position === 0)  imgLeft = `-${CORNER_OFFSET}%`;
-  if (position === 10 || position === 0)  imgTop  = `-${CORNER_OFFSET}%`;
-
   return (
-    <div
-      style={{
-        width: "100%",
-        height: "100%",
-        position: "relative",
-        overflow: "hidden",
-        backgroundColor: TILE_BG,
-      }}
-    >
+    <div style={{ width: "100%", height: "100%", overflow: "hidden" }}>
       <img
-        src="/board.png"
+        src={CORNER_IMAGES[position]}
         alt=""
         draggable={false}
         style={{
-          position: "absolute",
-          width:  `${CORNER_SCALE}%`,
-          height: `${CORNER_SCALE}%`,
-          left:   imgLeft,
-          top:    imgTop,
-          userSelect: "none",
-          pointerEvents: "none",
+          width:          "100%",
+          height:         "100%",
+          objectFit:      "cover",
+          display:        "block",
+          userSelect:     "none",
+          pointerEvents:  "none",
         }}
       />
     </div>
@@ -294,9 +310,9 @@ function BoardTile({ space }: { space: BoardSpace }) {
   const isVert   = rotation === 90 || rotation === -90;
   const isCorner = [0, 10, 20, 30].includes(space.position);
 
-  // Inner content dimensions (before rotation).
-  // For vertical tiles (left/right column): swap to CELL_CQI × CORNER_CQI
-  // so after ±90° rotation the element fits the display cell exactly.
+  // Inner content dims before rotation.
+  // Vertical tiles (left/right column): swap to CELL_CQI × CORNER_CQI so
+  // after ±90° the element fills the display cell exactly.
   const innerW = isVert ? `${CQI_CELL}cqi`   : "100%";
   const innerH = isVert ? `${CQI_CORNER}cqi` : "100%";
 
@@ -318,7 +334,7 @@ function BoardTile({ space }: { space: BoardSpace }) {
   } else if (space.type === "tax") {
     content = <TaxContent name={space.name} />;
   } else if (space.type === "dice_station") {
-    content = <DiceStationContent name={space.name} />;
+    content = <StationContent name={space.name} />;
   } else {
     content = (
       <div
@@ -330,6 +346,8 @@ function BoardTile({ space }: { space: BoardSpace }) {
           justifyContent: "center",
           fontSize: "1cqi",
           backgroundColor: TILE_BG,
+          textAlign: "center",
+          padding: "0.3cqi",
         }}
       >
         {space.name}
@@ -340,13 +358,13 @@ function BoardTile({ space }: { space: BoardSpace }) {
   return (
     <div
       style={{
-        position: "absolute",
-        left:   `${left}%`,
-        top:    `${top}%`,
-        width:  `${width}%`,
-        height: `${height}%`,
-        border: TILE_BORDER,
-        overflow: "hidden",
+        position:  "absolute",
+        left:      `${left}%`,
+        top:       `${top}%`,
+        width:     `${width}%`,
+        height:    `${height}%`,
+        border:    TILE_BORDER,
+        overflow:  "hidden",
         boxSizing: "border-box",
       }}
     >
@@ -355,11 +373,11 @@ function BoardTile({ space }: { space: BoardSpace }) {
       ) : (
         <div
           style={{
-            position: "absolute",
-            top:  "50%",
-            left: "50%",
-            width:  innerW,
-            height: innerH,
+            position:  "absolute",
+            top:       "50%",
+            left:      "50%",
+            width:     innerW,
+            height:    innerH,
             transform: `translate(-50%,-50%) rotate(${rotation}deg)`,
           }}
         >
@@ -395,7 +413,7 @@ function CircleToken({
         justifyContent:  "center",
         overflow:        "hidden",
         flexShrink:      0,
-        boxShadow:       "0 1px 4px rgba(0,0,0,0.35)",
+        boxShadow:       "0 1px 4px rgba(0,0,0,0.4)",
       }}
     >
       {isTokenImage(emoji) ? (
@@ -403,7 +421,7 @@ function CircleToken({
           src={emoji}
           alt={name}
           draggable={false}
-          style={{ width: "70%", height: "70%", objectFit: "contain" }}
+          style={{ width: "72%", height: "72%", objectFit: "contain" }}
         />
       ) : (
         <span style={{ fontSize: `${sizePercent * 0.45}cqi`, lineHeight: 1 }}>{emoji}</span>
@@ -428,55 +446,52 @@ export default function MonopolyBoard({ spaces, teams }: Props) {
   return (
     <div
       style={{
-        position:      "relative",
-        width:         "100%",
-        aspectRatio:   "1 / 1",
-        containerType: "inline-size",
-        backgroundColor: "#1a2a4a", // board outer border colour
-        border: "3px solid #1a2a4a",
-        boxSizing: "border-box",
+        position:        "relative",
+        width:           "100%",
+        aspectRatio:     "1 / 1",
+        containerType:   "inline-size",
+        backgroundColor: "#e8e0cc", // cream — shows between tile borders
+        border:          "4px solid #1a2a4a",
+        boxSizing:       "border-box",
+        overflow:        "hidden",
       }}
     >
-      {/* ── Board tiles ─────────────────────────────────────── */}
+      {/* ── 40 individual board tiles ───────────────────────── */}
       {spaces.map((space) => (
         <BoardTile key={space.id} space={space} />
       ))}
 
-      {/* ── Board centre (logo from board.png) ──────────────── */}
+      {/* ── Board centre — pre-cropped PNG, no scaling tricks ── */}
       <div
         style={{
-          position:   "absolute",
-          left:       `${CORNER}%`,
-          top:        `${CORNER}%`,
-          width:      `${100 - 2 * CORNER}%`,
-          height:     `${100 - 2 * CORNER}%`,
-          overflow:   "hidden",
+          position: "absolute",
+          left:     `${CORNER}%`,
+          top:      `${CORNER}%`,
+          width:    `${100 - 2 * CORNER}%`,
+          height:   `${100 - 2 * CORNER}%`,
+          overflow: "hidden",
           pointerEvents: "none",
         }}
       >
-        {/* Scale board.png so that its centre section exactly fills this div */}
         <img
-          src="/board.png"
+          src="/board_center.png"
           alt="Board centre"
           draggable={false}
           style={{
-            position: "absolute",
-            // 100 / 68.75 = 145.45 %
-            width:  `${(1152 / (1152 - 360)) * 100}%`,
-            height: `${(1152 / (1152 - 360)) * 100}%`,
-            // -(180 / 792) = −22.73 %
-            left: `-${(180 / (1152 - 360)) * 100}%`,
-            top:  `-${(180 / (1152 - 360)) * 100}%`,
+            width:         "100%",
+            height:        "100%",
+            objectFit:     "cover",
+            display:       "block",
             userSelect:    "none",
             pointerEvents: "none",
           }}
         />
       </div>
 
-      {/* ── Overlay (tokens + frames) ────────────────────────── */}
+      {/* ── Overlay: frames + ownership tokens + team tokens ── */}
       <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
 
-        {/* Property frames: coloured outline when a team is standing on this tile */}
+        {/* Property frame: coloured outline when a team is on this tile */}
         {propertySpaces.map((space) => {
           const teamsHere = teamsByPosition[space.position] ?? [];
           if (teamsHere.length === 0) return null;
@@ -499,15 +514,14 @@ export default function MonopolyBoard({ spaces, teams }: Props) {
           );
         })}
 
-        {/* Ownership tokens: pinned to tile center-top so they never hide under borders */}
+        {/* Ownership token: centred in the top portion of the tile */}
         {propertySpaces
           .filter((s) => s.ownerId && (s as any).ownerEmoji)
           .map((space) => {
             const [row, col] = getGridPos(space.position);
             const { left, top, width, height } = getCellBounds(row, col);
-            // Centre-top of tile
             const cx = left + width / 2;
-            const cy = top  + height * 0.18;
+            const cy = top  + height * 0.22;
             return (
               <div
                 key={`owner-${space.id}`}
@@ -516,21 +530,21 @@ export default function MonopolyBoard({ spaces, teams }: Props) {
                   position:  "absolute",
                   left:      `${cx}%`,
                   top:       `${cy}%`,
-                  transform: "translate(-50%, -50%)",
+                  transform: "translate(-50%,-50%)",
                   zIndex:    12,
                 }}
               >
                 <CircleToken
                   emoji={(space as any).ownerEmoji as string}
                   name={space.ownerName ?? ""}
-                  sizePercent={4.0}
+                  sizePercent={4.2}
                   borderColor={(space as any).ownerColor ?? "#1a3a6b"}
                 />
               </div>
             );
           })}
 
-        {/* Team tokens: centred on cell, orbiting when multiple teams share a cell */}
+        {/* Team tokens: centred on cell, orbit when multiple teams share a tile */}
         {Object.entries(teamsByPosition).map(([posStr, teamsHere]) => {
           const position = parseInt(posStr, 10);
           const [row, col] = getGridPos(position);
@@ -542,7 +556,7 @@ export default function MonopolyBoard({ spaces, teams }: Props) {
             let dx = 0, dy = 0;
             if (total > 1) {
               const angle  = (idx / total) * 2 * Math.PI - Math.PI / 2;
-              const radius = total <= 3 ? 1.8 : 2.4;
+              const radius = total <= 3 ? 2.0 : 2.6;
               dx = Math.cos(angle) * radius;
               dy = Math.sin(angle) * radius;
             }
@@ -561,7 +575,7 @@ export default function MonopolyBoard({ spaces, teams }: Props) {
                 <CircleToken
                   emoji={team.emoji}
                   name={team.name}
-                  sizePercent={5.6}
+                  sizePercent={5.8}
                 />
               </div>
             );
