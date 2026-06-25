@@ -194,7 +194,7 @@ function GoContent() {
         alt="GO arrow"
         draggable={false}
         style={{
-          width: "12cqi", height: "5cqi",
+          width: "13cqi", height: "7cqi",
           objectFit: "contain", flexShrink: 0,
           userSelect: "none",
         }}
