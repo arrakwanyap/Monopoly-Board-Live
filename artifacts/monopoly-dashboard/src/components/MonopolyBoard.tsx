@@ -437,25 +437,68 @@ export default function MonopolyBoard({ spaces, teams }: Props) {
         <BoardTile key={space.id} space={space} />
       ))}
 
-      {/* Board centre — pre-cropped PNG */}
+      {/* Board centre — navy field matching the original board colour */}
       <div
         style={{
           position: "absolute",
           left: `${CORNER}%`, top: `${CORNER}%`,
           width: `${100 - 2 * CORNER}%`, height: `${100 - 2 * CORNER}%`,
-          overflow: "hidden", pointerEvents: "none",
+          backgroundColor: "#001D61",
+          pointerEvents: "none",
+          overflow: "hidden",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
-        <img
-          src="/board_center.png"
-          alt=""
-          draggable={false}
+        {/* Diagonal MONOPOLY FOR YEW banner reproduced in CSS */}
+        <div
           style={{
-            width: "100%", height: "100%",
-            objectFit: "cover", display: "block",
-            userSelect: "none", pointerEvents: "none",
+            transform: "rotate(-35deg)",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "0.6cqi",
+            userSelect: "none",
           }}
-        />
+        >
+          <div
+            style={{
+              backgroundColor: "#ed1c24",
+              padding: "0.7cqi 4cqi",
+              boxShadow: "0 0.3cqi 0.8cqi rgba(0,0,0,0.5)",
+            }}
+          >
+            <span
+              style={{
+                fontFamily: "'Nunito', sans-serif",
+                fontWeight: 900,
+                fontSize: "5.5cqi",
+                color: "#fff",
+                letterSpacing: "0.06em",
+                textTransform: "uppercase",
+                whiteSpace: "nowrap",
+              }}
+            >
+              MONOPOLY
+            </span>
+          </div>
+          <div>
+            <span
+              style={{
+                fontFamily: "'Nunito', sans-serif",
+                fontWeight: 900,
+                fontSize: "3.0cqi",
+                color: "#fff",
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                whiteSpace: "nowrap",
+              }}
+            >
+              FOR YEW
+            </span>
+          </div>
+        </div>
       </div>
 
       {/* Overlay: frames + ownership tokens + team tokens */}
