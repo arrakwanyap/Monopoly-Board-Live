@@ -160,7 +160,7 @@ function TaxContent({ name }: { name: string }) {
         src={name.toLowerCase().includes("co-curricular") ? "/activities.png" : "/school.png"}
         alt="Tax"
         draggable={false}
-        style={{ width: "4cqi", height: "4cqi", objectFit: "contain", userSelect: "none" }}
+        style={{ width: "5.5cqi", height: "5.5cqi", objectFit: "contain", userSelect: "none" }}
       />
       <span style={{
         fontSize: "0.9cqi", fontWeight: 700,
