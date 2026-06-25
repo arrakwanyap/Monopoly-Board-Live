@@ -183,11 +183,11 @@ function GoContent() {
     }}>
       <div style={{
         position: "absolute",
-        top: "50%", left: "50%",
+        top: "65%", left: "50%",
         transform: "translate(-50%, -50%)",
         width: "100%",
         display: "flex", flexDirection: "column",
-        alignItems: "center", gap: "0.2cqi",
+        alignItems: "center", gap: "0.1cqi",
       }}>
         <span style={{
           fontSize: "1.2cqi", fontWeight: 800,
