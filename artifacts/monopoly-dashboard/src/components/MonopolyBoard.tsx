@@ -46,7 +46,7 @@ function getTileRotation(position: number): 0 | 90 | 180 | -90 {
   if (CORNERS.includes(position))        return 0;
   if (position >= 1  && position <= 7)   return 0;
   if (position >= 9  && position <= 15)  return 90;
-  if (position >= 17 && position <= 23)  return 180;
+  if (position >= 17 && position <= 23)  return 0;
   if (position >= 25 && position <= 31)  return -90;
   return 0;
 }
