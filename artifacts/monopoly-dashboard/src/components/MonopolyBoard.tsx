@@ -156,7 +156,7 @@ function TaxContent({ name }: { name: string }) {
       gap: "0.3cqi", padding: "0.4cqi",
       fontFamily: KABEL,
     }}>
-      <span style={{ fontSize: "2.8cqi", lineHeight: 1 }}>💰</span>
+      <img src="/school.png" alt="Tax" draggable={false} style={{ width: "3cqi", height: "3cqi", objectFit: "contain", userSelect: "none" }} />
       <span style={{
         fontSize: "0.9cqi", fontWeight: 700,
         textAlign: "center", color: "#333",
