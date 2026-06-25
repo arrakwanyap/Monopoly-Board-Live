@@ -38,7 +38,7 @@ export default function EventFeed({ events, isLoading }: Props) {
   const sorted = [...events].reverse();
 
   return (
-    <div className="flex flex-col gap-1.5 overflow-y-auto max-h-64 pr-1">
+    <div className="flex flex-col gap-1.5 pr-1">
       {sorted.map((event) => {
         const color = EVENT_TYPE_COLOR[event.type] ?? "#7f8c8d";
         const label = EVENT_TYPE_LABEL[event.type] ?? event.type;
