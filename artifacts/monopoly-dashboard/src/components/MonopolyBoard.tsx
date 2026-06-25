@@ -299,10 +299,10 @@ function FreeParkingContent() {
       backgroundColor: TILE_BG,
       display: "flex", flexDirection: "column",
       alignItems: "center", justifyContent: "center",
-      fontFamily: KABEL, gap: "0.5cqi", padding: "0.8cqi",
+      fontFamily: KABEL, gap: "0.3cqi", padding: "0.5cqi",
     }}>
       <span style={{
-        fontSize: "1.7cqi", fontWeight: 900,
+        fontSize: "1.5cqi", fontWeight: 900,
         color: RED, textTransform: "uppercase",
         letterSpacing: "0.06em", lineHeight: 1,
         textAlign: "center",
@@ -316,14 +316,14 @@ function FreeParkingContent() {
         alt="Free Parking car"
         draggable={false}
         style={{
-          width: "9cqi", height: "9cqi",
+          width: "7cqi", height: "7cqi",
           objectFit: "contain", flexShrink: 0,
           userSelect: "none",
         }}
       />
 
       <span style={{
-        fontSize: "1.7cqi", fontWeight: 900,
+        fontSize: "1.5cqi", fontWeight: 900,
         color: NAVY, textTransform: "uppercase",
         letterSpacing: "0.06em", lineHeight: 1,
         textAlign: "center",
@@ -342,10 +342,10 @@ function GoToJailContent() {
       backgroundColor: TILE_BG,
       display: "flex", flexDirection: "column",
       alignItems: "center", justifyContent: "center",
-      fontFamily: KABEL, gap: "0.5cqi", padding: "0.8cqi",
+      fontFamily: KABEL, gap: "0.3cqi", padding: "0.5cqi",
     }}>
       <span style={{
-        fontSize: "1.55cqi", fontWeight: 900,
+        fontSize: "1.4cqi", fontWeight: 900,
         color: NAVY, textTransform: "uppercase",
         letterSpacing: "0.04em", lineHeight: 1,
         textAlign: "center",
@@ -359,14 +359,14 @@ function GoToJailContent() {
         alt="Go To Jail officer"
         draggable={false}
         style={{
-          width: "10cqi", height: "10cqi",
+          width: "7.5cqi", height: "7.5cqi",
           objectFit: "contain", flexShrink: 0,
           userSelect: "none",
         }}
       />
 
       <span style={{
-        fontSize: "1.55cqi", fontWeight: 900,
+        fontSize: "1.4cqi", fontWeight: 900,
         color: RED, textTransform: "uppercase",
         letterSpacing: "0.04em", lineHeight: 1,
         textAlign: "center",
