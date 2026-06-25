@@ -316,21 +316,17 @@ function FreeParkingContent() {
         FREE
       </span>
 
-      {/* P parking symbol */}
-      <div style={{
-        width: "5cqi", height: "5cqi",
-        borderRadius: "50%",
-        backgroundColor: NAVY,
-        display: "flex", alignItems: "center", justifyContent: "center",
-        flexShrink: 0,
-      }}>
-        <span style={{
-          fontSize: "3.2cqi", fontWeight: 900,
-          color: "#fff", lineHeight: 1,
-        }}>
-          P
-        </span>
-      </div>
+      {/* Car icon */}
+      <img
+        src="/free_parking_car.png"
+        alt="Free Parking car"
+        draggable={false}
+        style={{
+          width: "6cqi", height: "6cqi",
+          objectFit: "contain", flexShrink: 0,
+          userSelect: "none",
+        }}
+      />
 
       <span style={{
         fontSize: "1.7cqi", fontWeight: 900,
