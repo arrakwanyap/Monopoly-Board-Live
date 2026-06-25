@@ -194,7 +194,7 @@ function GoContent() {
         alt="GO arrow"
         draggable={false}
         style={{
-          width: "9cqi", height: "3.5cqi",
+          width: "12cqi", height: "5cqi",
           objectFit: "contain", flexShrink: 0,
           userSelect: "none",
         }}
@@ -283,7 +283,7 @@ function FreeParkingContent() {
         alt="Free Parking car"
         draggable={false}
         style={{
-          width: "7cqi", height: "7cqi",
+          width: "6cqi", height: "6cqi",
           objectFit: "contain", flexShrink: 0,
           userSelect: "none",
         }}
@@ -326,7 +326,7 @@ function GoToJailContent() {
         alt="Go To Jail officer"
         draggable={false}
         style={{
-          width: "7.5cqi", height: "7.5cqi",
+          width: "6cqi", height: "6cqi",
           objectFit: "contain", flexShrink: 0,
           userSelect: "none",
         }}
