@@ -214,13 +214,6 @@ function GoContent() {
         display: "flex", flexDirection: "column",
         alignItems: "center", gap: "0.3cqi",
       }}>
-        <span style={{
-          fontSize: "8cqi", fontWeight: 900,
-          color: RED, lineHeight: 0.85,
-          letterSpacing: "-0.05em",
-        }}>
-          GO
-        </span>
         <img
           src="/go_arrow.png"
           alt="GO arrow"
