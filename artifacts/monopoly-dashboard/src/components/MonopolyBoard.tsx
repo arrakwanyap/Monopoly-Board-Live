@@ -428,12 +428,14 @@ function BoardTile({ space }: { space: BoardSpace }) {
 }
 
 // ── Team token circle ──────────────────────────────────────────────────────
-function CircleToken({ emoji, name, sizePercent, borderColor = NAVY }: {
-  emoji: string; name: string; sizePercent: number; borderColor?: string;
+// IMPORTANT: always use cqi units for size — percentage widths on children of
+// absolutely-positioned parents with no explicit width resolve to 0 in CSS.
+function CircleToken({ emoji, name, sizeCqi, borderColor = NAVY }: {
+  emoji: string; name: string; sizeCqi: number; borderColor?: string;
 }) {
   return (
     <div style={{
-      width: `${sizePercent}%`, aspectRatio: "1 / 1",
+      width: `${sizeCqi}cqi`, height: `${sizeCqi}cqi`,
       borderRadius: "50%", backgroundColor: "#fff",
       border: `2px solid ${borderColor}`,
       display: "flex", alignItems: "center", justifyContent: "center",
@@ -444,7 +446,7 @@ function CircleToken({ emoji, name, sizePercent, borderColor = NAVY }: {
         <img src={emoji} alt={name} draggable={false}
           style={{ width: "72%", height: "72%", objectFit: "contain" }} />
       ) : (
-        <span style={{ fontSize: `${sizePercent * 0.45}cqi`, lineHeight: 1 }}>{emoji}</span>
+        <span style={{ fontSize: `${sizeCqi * 0.55}cqi`, lineHeight: 1 }}>{emoji}</span>
       )}
     </div>
   );
@@ -532,7 +534,7 @@ export default function MonopolyBoard({ spaces, teams }: Props) {
                 <CircleToken
                   emoji={(space as any).ownerEmoji as string}
                   name={space.ownerName ?? ""}
-                  sizePercent={4.2}
+                  sizeCqi={4.5}
                   borderColor={(space as any).ownerColor ?? NAVY}
                 />
               </div>
@@ -596,7 +598,7 @@ export default function MonopolyBoard({ spaces, teams }: Props) {
                 left: `${cx + dx}%`, top: `${cy + dy}%`,
                 transform: "translate(-50%,-50%)", zIndex: 20,
               }}>
-                <CircleToken emoji={team.emoji} name={team.name} sizePercent={5.8} />
+                <CircleToken emoji={team.emoji} name={team.name} sizeCqi={6} />
               </div>
             );
           });

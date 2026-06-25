@@ -280,7 +280,7 @@ function GameplayTab() {
       {
         onSuccess: () => {
           const msg = space
-            ? `${team?.name} moved to ${space.name} (pos ${pos})`
+            ? `${team?.name} moved to ${space.name}`
             : `${team?.name} moved to position ${pos}`;
           createEvent.mutate({ data: { message: msg, type: "system", teamId: parseInt(moveTeamId) } });
           invalidate();
@@ -303,19 +303,57 @@ function GameplayTab() {
             <label className={lbl}>Team</label>
             <select className={sel} value={moveTeamId} onChange={e => setMoveTeamId(e.target.value)}>
               <option value="">Select team…</option>
-              {teams?.map(t => (
-                <option key={t.id} value={t.id}>{t.name} — currently at pos {t.position}</option>
-              ))}
+              {teams?.map(t => {
+                const curSpace = board?.find(s => s.position === t.position);
+                return (
+                  <option key={t.id} value={t.id}>
+                    {t.name} — at {curSpace?.name ?? `pos ${t.position}`}
+                  </option>
+                );
+              })}
             </select>
           </div>
           <div>
             <label className={lbl}>Destination Space</label>
             <select className={sel} value={movePos} onChange={e => setMovePos(e.target.value)}>
-              {board?.map(s => (
-                <option key={s.position} value={s.position}>
-                  {s.position}: {s.name}{s.ownerId ? ` (owned by ${s.ownerName})` : ""}
-                </option>
-              ))}
+              {/* Corners */}
+              <optgroup label="─── Corners">
+                {board?.filter(s => [0,8,16,24].includes(s.position)).map(s => (
+                  <option key={s.position} value={s.position}>{s.name}</option>
+                ))}
+              </optgroup>
+              {/* Bottom row right→left */}
+              <optgroup label="─── Bottom row (right → left)">
+                {board?.filter(s => s.position >= 1 && s.position <= 7).map(s => (
+                  <option key={s.position} value={s.position}>
+                    {s.name}{s.ownerId ? ` — ${s.ownerName}` : ""}
+                  </option>
+                ))}
+              </optgroup>
+              {/* Left column bottom→top */}
+              <optgroup label="─── Left column (bottom → top)">
+                {board?.filter(s => s.position >= 9 && s.position <= 15).map(s => (
+                  <option key={s.position} value={s.position}>
+                    {s.name}{s.ownerId ? ` — ${s.ownerName}` : ""}
+                  </option>
+                ))}
+              </optgroup>
+              {/* Top row left→right */}
+              <optgroup label="─── Top row (left → right)">
+                {board?.filter(s => s.position >= 17 && s.position <= 23).map(s => (
+                  <option key={s.position} value={s.position}>
+                    {s.name}{s.ownerId ? ` — ${s.ownerName}` : ""}
+                  </option>
+                ))}
+              </optgroup>
+              {/* Right column top→bottom */}
+              <optgroup label="─── Right column (top → bottom)">
+                {board?.filter(s => s.position >= 25 && s.position <= 31).map(s => (
+                  <option key={s.position} value={s.position}>
+                    {s.name}{s.ownerId ? ` — ${s.ownerName}` : ""}
+                  </option>
+                ))}
+              </optgroup>
             </select>
           </div>
 
@@ -365,6 +403,7 @@ function GameplayTab() {
 function TeamsTab() {
   const qc = useQueryClient();
   const { data: teams, isLoading } = useListTeams({ query: { refetchInterval: 5000 } });
+  const { data: board } = useGetBoard({ query: { refetchInterval: 10000 } });
   const updateTeam  = useUpdateTeam();
   const createEvent = useCreateEvent();
 
@@ -431,7 +470,7 @@ function TeamsTab() {
               <div className="flex-1 min-w-0">
                 <div className="font-bold text-foreground text-sm">{team.name}</div>
                 <div className="text-xs text-muted-foreground">
-                  Pos {team.position} &nbsp;·&nbsp;
+                  {board?.find(s => s.position === team.position)?.name ?? `Pos ${team.position}`} &nbsp;·&nbsp;
                   <span className="text-green-400 font-semibold">${team.cash}</span>
                   &nbsp;·&nbsp;{team.propertyCount} properties
                 </div>
