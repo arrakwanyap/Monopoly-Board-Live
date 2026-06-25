@@ -203,16 +203,16 @@ function GoContent() {
           color: NAVY, textAlign: "center",
           lineHeight: 1.25, textTransform: "uppercase",
         }}>
-          COLLECT<br />$200 SALARY<br />AS YOU PASS
+          COLLECT $200 SALARY AS YOU PASS
         </span>
       </div>
 
-      {/* Lower-right triangle — GO + arrow */}
+      {/* Lower-right triangle — GO + arrow image */}
       <div style={{
         position: "absolute",
         bottom: "4%", right: "4%",
         display: "flex", flexDirection: "column",
-        alignItems: "center", gap: "0.1cqi",
+        alignItems: "center", gap: "0.3cqi",
       }}>
         <span style={{
           fontSize: "8cqi", fontWeight: 900,
@@ -221,12 +221,16 @@ function GoContent() {
         }}>
           GO
         </span>
-        <span style={{
-          fontSize: "4cqi", fontWeight: 900,
-          color: RED, lineHeight: 0.9,
-        }}>
-          ←
-        </span>
+        <img
+          src="/go_arrow.png"
+          alt="GO arrow"
+          draggable={false}
+          style={{
+            width: "7cqi", height: "2.5cqi",
+            objectFit: "contain",
+            userSelect: "none",
+          }}
+        />
       </div>
     </div>
   );
