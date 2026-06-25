@@ -182,14 +182,12 @@ function GoContent() {
     }}>
       <span style={{
         position: "absolute",
-        top: "2cqi", left: 0, right: 0,
+        top: "4cqi", left: 0, right: 0,
         fontSize: "1.2cqi", fontWeight: 800,
         color: NAVY, textAlign: "center",
         lineHeight: 1.25, textTransform: "uppercase",
-      }}>
-        Collect $200 Salary as you pass
-      </span>
-
+      }}>Collect $200 Salary 
+      as you pass</span>
       <img
         src="/go_arrow.png"
         alt="GO arrow"
@@ -273,7 +271,7 @@ function FreeParkingContent() {
     }}>
       <span style={{
         position: "absolute",
-        top: "0.8cqi", left: 0, right: 0,
+        top: "2.5cqi", left: 0, right: 0,
         fontSize: "1.5cqi", fontWeight: 900,
         color: RED, textTransform: "uppercase",
         letterSpacing: "0.06em", lineHeight: 1,
@@ -298,7 +296,7 @@ function FreeParkingContent() {
 
       <span style={{
         position: "absolute",
-        bottom: "0.8cqi", left: 0, right: 0,
+        bottom: "2.5cqi", left: 0, right: 0,
         fontSize: "1.5cqi", fontWeight: 900,
         color: NAVY, textTransform: "uppercase",
         letterSpacing: "0.06em", lineHeight: 1,
@@ -321,7 +319,7 @@ function GoToJailContent() {
     }}>
       <span style={{
         position: "absolute",
-        top: "0.8cqi", left: 0, right: 0,
+        top: "2.5cqi", left: 0, right: 0,
         fontSize: "1.4cqi", fontWeight: 900,
         color: NAVY, textTransform: "uppercase",
         letterSpacing: "0.04em", lineHeight: 1,
@@ -346,7 +344,7 @@ function GoToJailContent() {
 
       <span style={{
         position: "absolute",
-        bottom: "0.8cqi", left: 0, right: 0,
+        bottom: "2.5cqi", left: 0, right: 0,
         fontSize: "1.4cqi", fontWeight: 900,
         color: RED, textTransform: "uppercase",
         letterSpacing: "0.04em", lineHeight: 1,
