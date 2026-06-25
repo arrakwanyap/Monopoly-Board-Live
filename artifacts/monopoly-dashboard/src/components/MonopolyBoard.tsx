@@ -177,44 +177,28 @@ function GoContent() {
     <div style={{
       width: "100%", height: "100%",
       backgroundColor: TILE_BG,
-      position: "relative", overflow: "hidden",
-      fontFamily: KABEL,
+      display: "flex", flexDirection: "column",
+      alignItems: "center", justifyContent: "center",
+      fontFamily: KABEL, gap: "0.3cqi", padding: "0.5cqi",
     }}>
-      {/* Upper-left triangle — salary text */}
-      <div style={{
-        position: "absolute",
-        top: "4%", left: "4%",
-        width: "52%",
-        display: "flex", flexDirection: "column",
-        alignItems: "center", gap: "0.2cqi",
+      <span style={{
+        fontSize: "1.3cqi", fontWeight: 800,
+        color: NAVY, textAlign: "center",
+        lineHeight: 1.25, textTransform: "uppercase",
       }}>
-        <span style={{
-          fontSize: "0.9cqi", fontWeight: 800,
-          color: NAVY, textAlign: "center",
-          lineHeight: 1.25, textTransform: "uppercase",
-        }}>
-          COLLECT $200 SALARY AS YOU PASS
-        </span>
-      </div>
+        Collect $200 Salary as you pass
+      </span>
 
-      {/* Lower-right triangle — GO + arrow image */}
-      <div style={{
-        position: "absolute",
-        bottom: "4%", right: "4%",
-        display: "flex", flexDirection: "column",
-        alignItems: "center", gap: "0.3cqi",
-      }}>
-        <img
-          src="/go_arrow.png"
-          alt="GO arrow"
-          draggable={false}
-          style={{
-            width: "7cqi", height: "2.5cqi",
-            objectFit: "contain",
-            userSelect: "none",
-          }}
-        />
-      </div>
+      <img
+        src="/go_arrow.png"
+        alt="GO arrow"
+        draggable={false}
+        style={{
+          width: "9cqi", height: "3.5cqi",
+          objectFit: "contain", flexShrink: 0,
+          userSelect: "none",
+        }}
+      />
     </div>
   );
 }
