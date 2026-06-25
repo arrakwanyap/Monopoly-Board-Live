@@ -52,13 +52,6 @@ export default function Dashboard() {
             <div className="text-xs text-muted-foreground uppercase tracking-widest">Round</div>
             <div className="text-sm font-bold text-foreground">{gameState?.round ?? 0}</div>
           </div>
-          <a
-            href="/admin"
-            className="px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition-opacity hover:opacity-80"
-            style={{ backgroundColor: "#2563eb", color: "#fff" }}
-          >
-            Admin
-          </a>
         </div>
       </header>
 
