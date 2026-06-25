@@ -9,14 +9,11 @@ interface Props {
 }
 
 // ── Board geometry (32 tiles: 4 corners + 7 per side) ──────────────────────
-// Corner = 180px, 7 inner cells per side: CELL = 792/7 = 113.14px
-// At board width 1152px: CORNER% = 15.625%, CELL% = 9.821%
-const CORNER   = (180 / 1152) * 100;        // 15.625 %
-const CELL     = (792 / 7 / 1152) * 100;    //  9.821 %
+const CORNER   = (180 / 1152) * 100;
+const CELL     = (792 / 7 / 1152) * 100;
 const CQI_CORNER = 15.625;
-const CQI_CELL   = 792 / 7 / 1152 * 100;   //  9.821 cqi
+const CQI_CELL   = 792 / 7 / 1152 * 100;
 
-// Centre of each 9-slot axis (0 & 8 = corner slots, 1-7 = inner cells)
 const AXIS_CENTERS: number[] = [
   CORNER / 2,
   ...Array.from({ length: 7 }, (_, i) => CORNER + CELL * i + CELL / 2),
@@ -24,15 +21,6 @@ const AXIS_CENTERS: number[] = [
 ];
 
 // ── Grid helpers ───────────────────────────────────────────────────────────
-// Board positions 0-31 (32 total):
-//   0       = GO corner        (row 8, col 8)
-//   1-7     = bottom row       (row 8, col 7→1)
-//   8       = JAIL corner      (row 8, col 0)
-//   9-15    = left column      (row 7→1, col 0)
-//   16      = FREE PARKING     (row 0, col 0)
-//   17-23   = top row          (row 0, col 1→7)
-//   24      = GO TO JAIL       (row 0, col 8)
-//   25-31   = right column     (row 1→7, col 8)
 function getGridPos(position: number): [number, number] {
   if (position === 0)                    return [8, 8];
   if (position >= 1  && position <= 7)   return [8, 8 - position];
@@ -53,11 +41,6 @@ function getCellBounds(row: number, col: number) {
   return { left, top, width, height };
 }
 
-// Rotation so the colour band (at natural TOP) faces the board centre.
-//   Bottom row → 0°   (top = board centre side ✓)
-//   Left col → +90°  CW  (top → right = centre ✓)
-//   Top row → 180°        (top → bottom = centre ✓)
-//   Right col → −90° CCW  (top → left = centre ✓)
 function getTileRotation(position: number): 0 | 90 | 180 | -90 {
   const CORNERS = [0, 8, 16, 24];
   if (CORNERS.includes(position))        return 0;
@@ -68,107 +51,55 @@ function getTileRotation(position: number): 0 | 90 | 180 | -90 {
   return 0;
 }
 
-// ── Shared style ───────────────────────────────────────────────────────────
-const TILE_BG     = "#fff";
+// ── Shared tokens ──────────────────────────────────────────────────────────
+const TILE_BG     = "#E7E3E4";
 const TILE_BORDER = "1px solid #001D61";
-const KABEL       = "'Nunito', sans-serif"; // closest free web sub for ITC Kabel Std
+const NAVY        = "#001D61";
+const RED         = "#ed1c24";
+const ORANGE      = "#f7941d";
+const KABEL       = "'Nunito', sans-serif";
 
-// ── Tile content (natural orientation: band at TOP) ────────────────────────
-
-function PropertyContent({
-  name,
-  colorGroup,
-  price,
-}: {
-  name: string;
-  colorGroup: string;
-  price: number;
+// ── Property tile ──────────────────────────────────────────────────────────
+function PropertyContent({ name, colorGroup, price }: {
+  name: string; colorGroup: string; price: number;
 }) {
   const bandColor = COLOR_GROUP_HEX[colorGroup] ?? "#ccc";
-  const lightBands = new Set(["light_blue", "yellow"]);
-  const bandText   = lightBands.has(colorGroup) ? "#111" : "#fff";
 
   return (
-    <div
-      style={{
-        width: "100%",
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        backgroundColor: TILE_BG,
-        fontFamily: KABEL,
-        overflow: "hidden",
-      }}
-    >
-      {/* Colour band — at TOP in natural orientation → faces board centre */}
-      <div
-        style={{
-          height: "25%",
-          backgroundColor: bandColor,
-          flexShrink: 0,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <span
-          style={{
-            fontSize: "0.65cqi",
-            color: bandText,
-            fontWeight: 800,
-            letterSpacing: "0.04em",
-            textTransform: "uppercase",
-          }}
-        >
-          {colorGroup.replace("_", " ")}
-        </span>
-      </div>
+    <div style={{
+      width: "100%", height: "100%",
+      display: "flex", flexDirection: "column",
+      backgroundColor: TILE_BG,
+      fontFamily: KABEL, overflow: "hidden",
+    }}>
+      {/* Colour band — no text, just solid colour */}
+      <div style={{
+        height: "25%",
+        backgroundColor: bandColor,
+        flexShrink: 0,
+      }} />
 
-      {/* Name area */}
-      <div
-        style={{
-          flex: 1,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "0.2cqi 0.3cqi",
-          textAlign: "center",
-          overflow: "hidden",
-        }}
-      >
-        <span
-          style={{
-            fontSize: "1.1cqi",
-            fontWeight: 700,
-            lineHeight: 1.15,
-            color: "#111",
-            wordBreak: "break-word",
-            hyphens: "auto",
-          }}
-        >
+      {/* Name */}
+      <div style={{
+        flex: 1,
+        display: "flex", alignItems: "center", justifyContent: "center",
+        padding: "0.2cqi 0.3cqi", textAlign: "center", overflow: "hidden",
+      }}>
+        <span style={{
+          fontSize: "1.1cqi", fontWeight: 700, lineHeight: 1.15,
+          color: "#111", wordBreak: "break-word", hyphens: "auto",
+        }}>
           {name}
         </span>
       </div>
 
-      {/* Price — at BOTTOM in natural orientation → faces board edge */}
-      <div
-        style={{
-          height: "22%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexShrink: 0,
-          borderTop: "1px solid #ddd",
-        }}
-      >
-        <span
-          style={{
-            fontSize: "1.0cqi",
-            fontWeight: 800,
-            color: "#111",
-            fontFamily: KABEL,
-          }}
-        >
+      {/* Price */}
+      <div style={{
+        height: "22%", flexShrink: 0,
+        display: "flex", alignItems: "center", justifyContent: "center",
+        borderTop: `1px solid ${NAVY}33`,
+      }}>
+        <span style={{ fontSize: "1.0cqi", fontWeight: 800, color: "#111" }}>
           ${price}
         </span>
       </div>
@@ -176,80 +107,288 @@ function PropertyContent({
   );
 }
 
+// ── Chance tile ─────────────────────────────────────────────────────────────
 function ChanceContent() {
   return (
-    <div style={{ width: "100%", height: "100%", overflow: "hidden" }}>
-      <img
-        src="/chance_card.png"
-        alt="Chance"
-        draggable={false}
-        style={{
-          width: "100%", height: "100%",
-          objectFit: "cover", display: "block",
-          userSelect: "none", pointerEvents: "none",
-        }}
-      />
+    <div style={{
+      width: "100%", height: "100%",
+      backgroundColor: TILE_BG,
+      display: "flex", flexDirection: "column",
+      alignItems: "center", overflow: "hidden",
+      fontFamily: KABEL,
+    }}>
+      {/* CHANCE label */}
+      <div style={{
+        padding: "0.7cqi 0.4cqi 0.1cqi",
+        width: "100%", textAlign: "center",
+      }}>
+        <span style={{
+          fontSize: "1.0cqi", fontWeight: 800,
+          color: NAVY, letterSpacing: "0.12em", textTransform: "uppercase",
+        }}>
+          CHANCE
+        </span>
+      </div>
+
+      {/* Large pink ? */}
+      <div style={{
+        flex: 1,
+        display: "flex", alignItems: "center", justifyContent: "center",
+      }}>
+        <span style={{
+          fontSize: "6.5cqi", fontWeight: 900,
+          color: "#d93a96", lineHeight: 0.85,
+          fontFamily: KABEL,
+        }}>?</span>
+      </div>
     </div>
   );
 }
 
+// ── Tax / Fee tile ──────────────────────────────────────────────────────────
 function TaxContent({ name }: { name: string }) {
   return (
-    <div
-      style={{
-        width: "100%",
-        height: "100%",
-        backgroundColor: "#fff",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: "0.3cqi",
-        padding: "0.4cqi",
-        fontFamily: KABEL,
-      }}
-    >
+    <div style={{
+      width: "100%", height: "100%",
+      backgroundColor: TILE_BG,
+      display: "flex", flexDirection: "column",
+      alignItems: "center", justifyContent: "center",
+      gap: "0.3cqi", padding: "0.4cqi",
+      fontFamily: KABEL,
+    }}>
       <span style={{ fontSize: "2.8cqi", lineHeight: 1 }}>💰</span>
-      <span
-        style={{
-          fontSize: "0.9cqi",
-          fontWeight: 700,
-          textAlign: "center",
-          color: "#333",
-          lineHeight: 1.2,
-          textTransform: "uppercase",
-          letterSpacing: "0.05em",
-        }}
-      >
+      <span style={{
+        fontSize: "0.9cqi", fontWeight: 700,
+        textAlign: "center", color: "#333",
+        lineHeight: 1.2, textTransform: "uppercase",
+        letterSpacing: "0.05em",
+      }}>
         {name}
       </span>
     </div>
   );
 }
 
-// ── Corner tiles ───────────────────────────────────────────────────────────
-const CORNER_IMAGES: Record<number, string> = {
-   0: "/corner_go.png",
-   8: "/corner_jail.png",
-  16: "/corner_free_parking.png",
-  24: "/corner_go_to_jail.png",
-};
+// ── Corner tiles — CSS + editable text, no static PNG ─────────────────────
 
-function CornerContent({ position }: { position: number }) {
+// GO (pos 0 — bottom-right)
+function GoContent() {
   return (
-    <div style={{ width: "100%", height: "100%", overflow: "hidden" }}>
-      <img
-        src={CORNER_IMAGES[position]}
-        alt=""
-        draggable={false}
-        style={{
-          width: "100%", height: "100%",
-          objectFit: "cover", display: "block",
-          userSelect: "none", pointerEvents: "none",
-        }}
-      />
+    <div style={{
+      width: "100%", height: "100%",
+      backgroundColor: TILE_BG,
+      position: "relative", overflow: "hidden",
+      fontFamily: KABEL,
+    }}>
+      {/* Diagonal separator */}
+      <div style={{
+        position: "absolute",
+        top: "50%", left: "-10%",
+        width: "120%", height: "1.5px",
+        backgroundColor: NAVY,
+        transform: "rotate(45deg)",
+        transformOrigin: "center",
+      }} />
+
+      {/* Upper-left triangle — salary text */}
+      <div style={{
+        position: "absolute",
+        top: "4%", left: "4%",
+        width: "52%",
+        display: "flex", flexDirection: "column",
+        alignItems: "center", gap: "0.2cqi",
+      }}>
+        <span style={{
+          fontSize: "0.9cqi", fontWeight: 800,
+          color: NAVY, textAlign: "center",
+          lineHeight: 1.25, textTransform: "uppercase",
+        }}>
+          COLLECT<br />$200 SALARY<br />AS YOU PASS
+        </span>
+      </div>
+
+      {/* Lower-right triangle — GO + arrow */}
+      <div style={{
+        position: "absolute",
+        bottom: "4%", right: "4%",
+        display: "flex", flexDirection: "column",
+        alignItems: "center", gap: "0.1cqi",
+      }}>
+        <span style={{
+          fontSize: "8cqi", fontWeight: 900,
+          color: RED, lineHeight: 0.85,
+          letterSpacing: "-0.05em",
+        }}>
+          GO
+        </span>
+        <span style={{
+          fontSize: "4cqi", fontWeight: 900,
+          color: RED, lineHeight: 0.9,
+        }}>
+          ←
+        </span>
+      </div>
     </div>
   );
+}
+
+// JAIL (pos 8 — bottom-left) — Just Visiting / In Jail
+function JailContent() {
+  return (
+    <div style={{
+      width: "100%", height: "100%",
+      backgroundColor: TILE_BG,
+      display: "flex", flexDirection: "column",
+      fontFamily: KABEL, overflow: "hidden",
+    }}>
+      {/* Main area: jail cell */}
+      <div style={{
+        flex: 1,
+        display: "flex", flexDirection: "column",
+        alignItems: "center", justifyContent: "center",
+        gap: "0.5cqi", padding: "0.6cqi",
+      }}>
+        {/* Jail-cell box */}
+        <div style={{
+          border: `0.35cqi solid ${NAVY}`,
+          padding: "0.4cqi 0.6cqi",
+          display: "flex", flexDirection: "column",
+          alignItems: "center", gap: "0.4cqi",
+        }}>
+          {/* Bars */}
+          <div style={{
+            display: "flex", gap: "0.55cqi",
+            height: "3.5cqi", alignItems: "stretch",
+          }}>
+            {[0,1,2,3,4].map(i => (
+              <div key={i} style={{
+                width: "0.4cqi",
+                backgroundColor: NAVY,
+                borderRadius: "0.1cqi",
+              }} />
+            ))}
+          </div>
+          <span style={{
+            fontSize: "1.4cqi", fontWeight: 900,
+            color: RED, textTransform: "uppercase",
+            textAlign: "center", lineHeight: 1.1,
+          }}>
+            IN JAIL
+          </span>
+        </div>
+      </div>
+
+      {/* Bottom strip — JUST VISITING */}
+      <div style={{
+        flexShrink: 0,
+        backgroundColor: ORANGE,
+        padding: "0.55cqi 0.3cqi",
+        display: "flex", alignItems: "center", justifyContent: "center",
+      }}>
+        <span style={{
+          fontSize: "1.15cqi", fontWeight: 800,
+          color: "#fff", textTransform: "uppercase",
+          letterSpacing: "0.07em", textAlign: "center",
+        }}>
+          JUST VISITING
+        </span>
+      </div>
+    </div>
+  );
+}
+
+// FREE PARKING (pos 16 — top-left)
+function FreeParkingContent() {
+  return (
+    <div style={{
+      width: "100%", height: "100%",
+      backgroundColor: TILE_BG,
+      display: "flex", flexDirection: "column",
+      alignItems: "center", justifyContent: "center",
+      fontFamily: KABEL, gap: "0.5cqi", padding: "0.8cqi",
+    }}>
+      <span style={{
+        fontSize: "1.7cqi", fontWeight: 900,
+        color: RED, textTransform: "uppercase",
+        letterSpacing: "0.06em", lineHeight: 1,
+        textAlign: "center",
+      }}>
+        FREE
+      </span>
+
+      {/* P parking symbol */}
+      <div style={{
+        width: "5cqi", height: "5cqi",
+        borderRadius: "50%",
+        backgroundColor: NAVY,
+        display: "flex", alignItems: "center", justifyContent: "center",
+        flexShrink: 0,
+      }}>
+        <span style={{
+          fontSize: "3.2cqi", fontWeight: 900,
+          color: "#fff", lineHeight: 1,
+        }}>
+          P
+        </span>
+      </div>
+
+      <span style={{
+        fontSize: "1.7cqi", fontWeight: 900,
+        color: NAVY, textTransform: "uppercase",
+        letterSpacing: "0.06em", lineHeight: 1,
+        textAlign: "center",
+      }}>
+        PARKING
+      </span>
+    </div>
+  );
+}
+
+// GO TO JAIL (pos 24 — top-right)
+function GoToJailContent() {
+  return (
+    <div style={{
+      width: "100%", height: "100%",
+      backgroundColor: TILE_BG,
+      display: "flex", flexDirection: "column",
+      alignItems: "center", justifyContent: "center",
+      fontFamily: KABEL, gap: "0.5cqi", padding: "0.8cqi",
+    }}>
+      <span style={{
+        fontSize: "1.55cqi", fontWeight: 900,
+        color: NAVY, textTransform: "uppercase",
+        letterSpacing: "0.04em", lineHeight: 1,
+        textAlign: "center",
+      }}>
+        GO TO
+      </span>
+
+      {/* Pointing-hand icon */}
+      <div style={{
+        fontSize: "4.8cqi", lineHeight: 1, flexShrink: 0,
+        transform: "rotate(-45deg)",
+      }}>
+        👉
+      </div>
+
+      <span style={{
+        fontSize: "1.55cqi", fontWeight: 900,
+        color: RED, textTransform: "uppercase",
+        letterSpacing: "0.04em", lineHeight: 1,
+        textAlign: "center",
+      }}>
+        JAIL
+      </span>
+    </div>
+  );
+}
+
+function CornerContent({ position }: { position: number }) {
+  if (position === 0)  return <GoContent />;
+  if (position === 8)  return <JailContent />;
+  if (position === 16) return <FreeParkingContent />;
+  if (position === 24) return <GoToJailContent />;
+  return null;
 }
 
 // ── BoardTile ──────────────────────────────────────────────────────────────
@@ -262,8 +401,6 @@ function BoardTile({ space }: { space: BoardSpace }) {
   const isVert    = rotation === 90 || rotation === -90;
   const isCorner  = CORNER_POSITIONS.has(space.position);
 
-  // Pre-rotation inner dimensions (swapped for vertical tiles so after ±90° the
-  // element exactly fills the outer cell: CELL_CQI wide → CORNER_CQI after rotation)
   const innerW = isVert ? `${CQI_CELL}cqi`   : "100%";
   const innerH = isVert ? `${CQI_CORNER}cqi` : "100%";
 
@@ -284,39 +421,32 @@ function BoardTile({ space }: { space: BoardSpace }) {
     content = <TaxContent name={space.name} />;
   } else {
     content = (
-      <div
-        style={{
-          width: "100%", height: "100%",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: "1cqi", backgroundColor: TILE_BG,
-          textAlign: "center", padding: "0.3cqi",
-          fontFamily: KABEL,
-        }}
-      >
+      <div style={{
+        width: "100%", height: "100%",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        fontSize: "1cqi", backgroundColor: TILE_BG,
+        textAlign: "center", padding: "0.3cqi", fontFamily: KABEL,
+      }}>
         {space.name}
       </div>
     );
   }
 
   return (
-    <div
-      style={{
-        position: "absolute",
-        left: `${left}%`, top: `${top}%`,
-        width: `${width}%`, height: `${height}%`,
-        border: TILE_BORDER, overflow: "hidden", boxSizing: "border-box",
-      }}
-    >
+    <div style={{
+      position: "absolute",
+      left: `${left}%`, top: `${top}%`,
+      width: `${width}%`, height: `${height}%`,
+      border: TILE_BORDER, overflow: "hidden", boxSizing: "border-box",
+    }}>
       {isCorner ? (
         content
       ) : (
-        <div
-          style={{
-            position: "absolute", top: "50%", left: "50%",
-            width: innerW, height: innerH,
-            transform: `translate(-50%,-50%) rotate(${rotation}deg)`,
-          }}
-        >
+        <div style={{
+          position: "absolute", top: "50%", left: "50%",
+          width: innerW, height: innerH,
+          transform: `translate(-50%,-50%) rotate(${rotation}deg)`,
+        }}>
           {content}
         </div>
       )}
@@ -324,29 +454,19 @@ function BoardTile({ space }: { space: BoardSpace }) {
   );
 }
 
-// ── Team / ownership token circle ──────────────────────────────────────────
-function CircleToken({
-  emoji,
-  name,
-  sizePercent,
-  borderColor = "#001D61",
-}: {
-  emoji: string;
-  name: string;
-  sizePercent: number;
-  borderColor?: string;
+// ── Team token circle ──────────────────────────────────────────────────────
+function CircleToken({ emoji, name, sizePercent, borderColor = NAVY }: {
+  emoji: string; name: string; sizePercent: number; borderColor?: string;
 }) {
   return (
-    <div
-      style={{
-        width: `${sizePercent}%`, aspectRatio: "1 / 1",
-        borderRadius: "50%", backgroundColor: "#fff",
-        border: `2px solid ${borderColor}`,
-        display: "flex", alignItems: "center", justifyContent: "center",
-        overflow: "hidden", flexShrink: 0,
-        boxShadow: "0 1px 4px rgba(0,0,0,0.4)",
-      }}
-    >
+    <div style={{
+      width: `${sizePercent}%`, aspectRatio: "1 / 1",
+      borderRadius: "50%", backgroundColor: "#fff",
+      border: `2px solid ${borderColor}`,
+      display: "flex", alignItems: "center", justifyContent: "center",
+      overflow: "hidden", flexShrink: 0,
+      boxShadow: "0 1px 4px rgba(0,0,0,0.4)",
+    }}>
       {isTokenImage(emoji) ? (
         <img src={emoji} alt={name} draggable={false}
           style={{ width: "72%", height: "72%", objectFit: "contain" }} />
@@ -357,7 +477,7 @@ function CircleToken({
   );
 }
 
-// ── Main board component ───────────────────────────────────────────────────
+// ── Main board ─────────────────────────────────────────────────────────────
 export default function MonopolyBoard({ spaces, teams }: Props) {
   const teamsByPosition = useMemo(() => {
     const map: Record<number, Team[]> = {};
@@ -371,34 +491,27 @@ export default function MonopolyBoard({ spaces, teams }: Props) {
   );
 
   return (
-    <div
-      style={{
-        position: "relative",
-        width: "100%",
-        aspectRatio: "1 / 1",
-        containerType: "inline-size",
-        backgroundColor: "#fff",   // white → no cream grid showing between tiles
-        border: "4px solid #001D61",
-        boxSizing: "border-box",
-        overflow: "hidden",
-        fontFamily: KABEL,
-      }}
-    >
+    <div style={{
+      position: "relative",
+      width: "100%", aspectRatio: "1 / 1",
+      containerType: "inline-size",
+      backgroundColor: "#fff",
+      border: `4px solid ${NAVY}`,
+      boxSizing: "border-box", overflow: "hidden",
+      fontFamily: KABEL,
+    }}>
       {/* 32 board tiles */}
       {spaces.map((space) => (
         <BoardTile key={space.id} space={space} />
       ))}
 
       {/* Board centre image */}
-      <div
-        style={{
-          position: "absolute",
-          left: `${CORNER}%`, top: `${CORNER}%`,
-          width: `${100 - 2 * CORNER}%`, height: `${100 - 2 * CORNER}%`,
-          pointerEvents: "none",
-          overflow: "hidden",
-        }}
-      >
+      <div style={{
+        position: "absolute",
+        left: `${CORNER}%`, top: `${CORNER}%`,
+        width: `${100 - 2 * CORNER}%`, height: `${100 - 2 * CORNER}%`,
+        pointerEvents: "none", overflow: "hidden",
+      }}>
         <img
           src="/board_center_new.png"
           alt=""
@@ -411,59 +524,48 @@ export default function MonopolyBoard({ spaces, teams }: Props) {
         />
       </div>
 
-      {/* Overlay: frames + ownership tokens + team tokens */}
+      {/* Overlays: highlight frames + ownership badges + team tokens */}
       <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
 
-        {/* Highlight frame around tiles where a team is standing */}
         {propertySpaces.map((space) => {
           const here = teamsByPosition[space.position] ?? [];
           if (!here.length) return null;
           const [row, col] = getGridPos(space.position);
           const { left, top, width, height } = getCellBounds(row, col);
           return (
-            <div
-              key={`frame-${space.id}`}
-              style={{
-                position: "absolute",
-                left: `${left}%`, top: `${top}%`,
-                width: `${width}%`, height: `${height}%`,
-                outline: `3px solid ${here[0].color}`,
-                outlineOffset: "-3px",
-                zIndex: 8,
-              }}
-            />
+            <div key={`frame-${space.id}`} style={{
+              position: "absolute",
+              left: `${left}%`, top: `${top}%`,
+              width: `${width}%`, height: `${height}%`,
+              outline: `3px solid ${here[0].color}`,
+              outlineOffset: "-3px", zIndex: 8,
+            }} />
           );
         })}
 
-        {/* Ownership mini-token */}
         {propertySpaces
           .filter((s) => s.ownerId && (s as any).ownerEmoji)
           .map((space) => {
             const [row, col] = getGridPos(space.position);
             const { left, top, width, height } = getCellBounds(row, col);
             return (
-              <div
-                key={`owner-${space.id}`}
-                title={`Owned by ${space.ownerName ?? "?"}`}
+              <div key={`owner-${space.id}`} title={`Owned by ${space.ownerName ?? "?"}`}
                 style={{
                   position: "absolute",
                   left: `${left + width / 2}%`,
                   top:  `${top + height * 0.22}%`,
-                  transform: "translate(-50%,-50%)",
-                  zIndex: 12,
-                }}
-              >
+                  transform: "translate(-50%,-50%)", zIndex: 12,
+                }}>
                 <CircleToken
                   emoji={(space as any).ownerEmoji as string}
                   name={space.ownerName ?? ""}
                   sizePercent={4.2}
-                  borderColor={(space as any).ownerColor ?? "#1a3a6b"}
+                  borderColor={(space as any).ownerColor ?? NAVY}
                 />
               </div>
             );
           })}
 
-        {/* Team tokens — orbit when multiple teams share a tile */}
         {Object.entries(teamsByPosition).map(([posStr, here]) => {
           const pos = parseInt(posStr, 10);
           const [row, col] = getGridPos(pos);
@@ -479,16 +581,11 @@ export default function MonopolyBoard({ spaces, teams }: Props) {
               dy = Math.sin(angle) * radius;
             }
             return (
-              <div
-                key={team.id}
-                title={team.name}
-                style={{
-                  position: "absolute",
-                  left: `${cx + dx}%`, top: `${cy + dy}%`,
-                  transform: "translate(-50%,-50%)",
-                  zIndex: 20,
-                }}
-              >
+              <div key={team.id} title={team.name} style={{
+                position: "absolute",
+                left: `${cx + dx}%`, top: `${cy + dy}%`,
+                transform: "translate(-50%,-50%)", zIndex: 20,
+              }}>
                 <CircleToken emoji={team.emoji} name={team.name} sizePercent={5.8} />
               </div>
             );
