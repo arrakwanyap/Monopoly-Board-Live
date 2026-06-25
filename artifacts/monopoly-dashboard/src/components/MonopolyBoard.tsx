@@ -182,7 +182,7 @@ function GoContent() {
     }}>
       <span style={{
         position: "absolute",
-        top: "4cqi", left: 0, right: 0,
+        top: "5cqi", left: 0, right: 0,
         fontSize: "1.2cqi", fontWeight: 800,
         color: NAVY, textAlign: "center",
         lineHeight: 1.25, textTransform: "uppercase",
@@ -195,7 +195,7 @@ function GoContent() {
           position: "absolute",
           bottom: "1.5cqi", left: "50%",
           transform: "translateX(-50%)",
-          width: "13cqi", height: "6cqi",
+          width: "13cqi", height: "7.5cqi",
           objectFit: "contain",
           userSelect: "none",
         }}
