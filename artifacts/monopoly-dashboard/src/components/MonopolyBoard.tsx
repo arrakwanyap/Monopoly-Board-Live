@@ -129,17 +129,18 @@ function ChanceContent() {
           CHANCE
         </span>
       </div>
-
       {/* Large pink ? */}
       <div style={{
         flex: 1,
         display: "flex", alignItems: "center", justifyContent: "center",
       }}>
-        <span style={{
-          fontSize: "6.5cqi", fontWeight: 900,
-          color: "#d93a96", lineHeight: 0.85,
-          fontFamily: KABEL,
-        }}>?</span>
+        <span
+          style={{
+            fontSize: "6.5cqi", fontWeight: 900,
+            color: "#d93a96", lineHeight: 0.85,
+            fontFamily: KABEL,
+          }}
+          className="text-[80px]">?</span>
       </div>
     </div>
   );
