@@ -70,7 +70,7 @@ function getTileRotation(position: number): 0 | 90 | 180 | -90 {
 
 // ── Shared style ───────────────────────────────────────────────────────────
 const TILE_BG     = "#fff";
-const TILE_BORDER = "1px solid #333";
+const TILE_BORDER = "1px solid #001D61";
 const KABEL       = "'Nunito', sans-serif"; // closest free web sub for ITC Kabel Std
 
 // ── Tile content (natural orientation: band at TOP) ────────────────────────
@@ -178,65 +178,17 @@ function PropertyContent({
 
 function ChanceContent() {
   return (
-    <div
-      style={{
-        width: "100%",
-        height: "100%",
-        backgroundColor: "#fffef0",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "space-between",
-        fontFamily: KABEL,
-        overflow: "hidden",
-      }}
-    >
-      {/* CHANCE label — at TOP */}
-      <div
+    <div style={{ width: "100%", height: "100%", overflow: "hidden" }}>
+      <img
+        src="/chance_card.png"
+        alt="Chance"
+        draggable={false}
         style={{
-          paddingTop: "0.5cqi",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          width: "100%",
+          width: "100%", height: "100%",
+          objectFit: "cover", display: "block",
+          userSelect: "none", pointerEvents: "none",
         }}
-      >
-        <span
-          style={{
-            fontSize: "1.0cqi",
-            fontWeight: 900,
-            color: "#d93a96",
-            letterSpacing: "0.12em",
-            textTransform: "uppercase",
-          }}
-        >
-          CHANCE
-        </span>
-      </div>
-
-      {/* Stylised question mark — at BOTTOM */}
-      <div
-        style={{
-          flex: 1,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <span
-          style={{
-            fontSize: "4.8cqi",
-            fontWeight: 900,
-            color: "#d93a96",
-            fontStyle: "italic",
-            lineHeight: 1,
-            fontFamily: "'Georgia', serif",
-            textShadow: "2px 2px 0 rgba(217,58,150,0.2)",
-          }}
-        >
-          ?
-        </span>
-      </div>
+      />
     </div>
   );
 }
@@ -377,7 +329,7 @@ function CircleToken({
   emoji,
   name,
   sizePercent,
-  borderColor = "#1a3a6b",
+  borderColor = "#001D61",
 }: {
   emoji: string;
   name: string;
@@ -426,7 +378,7 @@ export default function MonopolyBoard({ spaces, teams }: Props) {
         aspectRatio: "1 / 1",
         containerType: "inline-size",
         backgroundColor: "#fff",   // white → no cream grid showing between tiles
-        border: "4px solid #1a2a4a",
+        border: "4px solid #001D61",
         boxSizing: "border-box",
         overflow: "hidden",
         fontFamily: KABEL,
