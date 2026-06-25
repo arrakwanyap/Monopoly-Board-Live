@@ -248,34 +248,24 @@ function JailContent() {
         alignItems: "center", justifyContent: "center",
         gap: "0.5cqi", padding: "0.6cqi",
       }}>
-        {/* Jail-cell box */}
-        <div style={{
-          border: `0.35cqi solid ${NAVY}`,
-          padding: "0.4cqi 0.6cqi",
-          display: "flex", flexDirection: "column",
-          alignItems: "center", gap: "0.4cqi",
+        {/* In Jail image */}
+        <img
+          src="/in_jail.png"
+          alt="In Jail"
+          draggable={false}
+          style={{
+            width: "7cqi", height: "7cqi",
+            objectFit: "contain", flexShrink: 0,
+            userSelect: "none",
+          }}
+        />
+        <span style={{
+          fontSize: "1.4cqi", fontWeight: 900,
+          color: RED, textTransform: "uppercase",
+          textAlign: "center", lineHeight: 1.1,
         }}>
-          {/* Bars */}
-          <div style={{
-            display: "flex", gap: "0.55cqi",
-            height: "3.5cqi", alignItems: "stretch",
-          }}>
-            {[0,1,2,3,4].map(i => (
-              <div key={i} style={{
-                width: "0.4cqi",
-                backgroundColor: NAVY,
-                borderRadius: "0.1cqi",
-              }} />
-            ))}
-          </div>
-          <span style={{
-            fontSize: "1.4cqi", fontWeight: 900,
-            color: RED, textTransform: "uppercase",
-            textAlign: "center", lineHeight: 1.1,
-          }}>
-            IN JAIL
-          </span>
-        </div>
+          IN JAIL
+        </span>
       </div>
 
       {/* Bottom strip — JUST VISITING */}
