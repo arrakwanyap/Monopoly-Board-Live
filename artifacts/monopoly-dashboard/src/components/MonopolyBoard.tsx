@@ -180,26 +180,30 @@ function GoContent() {
       position: "relative",
       fontFamily: KABEL, overflow: "hidden",
     }}>
-      <span style={{
+      <div style={{
         position: "absolute",
-        top: "5cqi", left: 0, right: 0,
-        fontSize: "1.2cqi", fontWeight: 800,
-        color: NAVY, textAlign: "center",
-        lineHeight: 1.25, textTransform: "uppercase",
-      }}>Collect $200 Salary<br />as you pass</span>
-      <img
-        src="/go_arrow.png"
-        alt="GO arrow"
-        draggable={false}
-        style={{
-          position: "absolute",
-          bottom: "1.5cqi", left: "50%",
-          transform: "translateX(-50%)",
-          width: "13cqi", height: "7.5cqi",
-          objectFit: "contain",
-          userSelect: "none",
-        }}
-      />
+        top: "50%", left: "50%",
+        transform: "translate(-50%, -50%)",
+        width: "100%",
+        display: "flex", flexDirection: "column",
+        alignItems: "center", gap: "0.5cqi",
+      }}>
+        <span style={{
+          fontSize: "1.2cqi", fontWeight: 800,
+          color: NAVY, textAlign: "center",
+          lineHeight: 1.25, textTransform: "uppercase",
+        }}>Collect $200 Salary<br />as you pass</span>
+        <img
+          src="/go_arrow.png"
+          alt="GO arrow"
+          draggable={false}
+          style={{
+            width: "13cqi", height: "7.5cqi",
+            objectFit: "contain",
+            userSelect: "none",
+          }}
+        />
+      </div>
     </div>
   );
 }
