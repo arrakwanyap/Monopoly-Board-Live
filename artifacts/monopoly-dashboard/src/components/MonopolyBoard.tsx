@@ -547,12 +547,45 @@ export default function MonopolyBoard({ spaces, teams }: Props) {
           const pos = parseInt(posStr, 10);
           const isCornerPos = CORNER_POSITIONS.has(pos);
           const [row, col] = getGridPos(pos);
+
+          if (isCornerPos) {
+            const { left, top, width, height } = getCellBounds(row, col);
+            return (
+              <div key={`tokens-${pos}`} style={{
+                position: "absolute",
+                left: `${left + width / 2}%`,
+                top: `${top + height / 2}%`,
+                transform: "translate(-50%, -50%)",
+                display: "flex", flexWrap: "wrap",
+                justifyContent: "center", alignItems: "center",
+                gap: "0.5cqi",
+                width: "13cqi",
+                zIndex: 20,
+              }}>
+                {here.map((team) => (
+                  <div key={team.id} title={team.name} style={{
+                    width: "3.5cqi", height: "3.5cqi",
+                    borderRadius: "50%", backgroundColor: "#fff",
+                    border: `2px solid ${NAVY}`,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    overflow: "hidden", flexShrink: 0,
+                    boxShadow: "0 1px 4px rgba(0,0,0,0.4)",
+                  }}>
+                    {isTokenImage(team.emoji) ? (
+                      <img src={team.emoji} alt={team.name} draggable={false}
+                        style={{ width: "80%", height: "80%", objectFit: "contain" }} />
+                    ) : (
+                      <span style={{ fontSize: "2.2cqi", lineHeight: 1 }}>{team.emoji}</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            );
+          }
+
           const cx = AXIS_CENTERS[col];
           const cy = AXIS_CENTERS[row];
-          const tokenSize = isCornerPos ? 9 : 5.8;
-          const spreadRadius = isCornerPos
-            ? (here.length <= 3 ? 3.5 : 4.5)
-            : (here.length <= 3 ? 2.0 : 2.6);
+          const spreadRadius = here.length <= 3 ? 2.0 : 2.6;
 
           return here.map((team, idx) => {
             let dx = 0, dy = 0;
@@ -567,7 +600,7 @@ export default function MonopolyBoard({ spaces, teams }: Props) {
                 left: `${cx + dx}%`, top: `${cy + dy}%`,
                 transform: "translate(-50%,-50%)", zIndex: 20,
               }}>
-                <CircleToken emoji={team.emoji} name={team.name} sizePercent={tokenSize} />
+                <CircleToken emoji={team.emoji} name={team.name} sizePercent={5.8} />
               </div>
             );
           });
