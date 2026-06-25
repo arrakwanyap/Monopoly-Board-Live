@@ -186,7 +186,7 @@ function GoContent() {
         transform: "translate(-50%, -50%)",
         width: "100%",
         display: "flex", flexDirection: "column",
-        alignItems: "center", gap: "0.5cqi",
+        alignItems: "center", gap: "0.2cqi",
       }}>
         <span style={{
           fontSize: "1.2cqi", fontWeight: 800,
@@ -198,7 +198,7 @@ function GoContent() {
           alt="GO arrow"
           draggable={false}
           style={{
-            width: "13cqi", height: "7.5cqi",
+            width: "14cqi", height: "9cqi",
             objectFit: "contain",
             userSelect: "none",
           }}
