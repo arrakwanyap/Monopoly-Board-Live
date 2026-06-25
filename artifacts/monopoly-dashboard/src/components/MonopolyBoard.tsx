@@ -180,16 +180,6 @@ function GoContent() {
       position: "relative", overflow: "hidden",
       fontFamily: KABEL,
     }}>
-      {/* Diagonal separator */}
-      <div style={{
-        position: "absolute",
-        top: "50%", left: "-10%",
-        width: "120%", height: "1.5px",
-        backgroundColor: NAVY,
-        transform: "rotate(45deg)",
-        transformOrigin: "center",
-      }} />
-
       {/* Upper-left triangle — salary text */}
       <div style={{
         position: "absolute",
