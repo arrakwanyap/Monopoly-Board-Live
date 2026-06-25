@@ -359,13 +359,17 @@ function GoToJailContent() {
         GO TO
       </span>
 
-      {/* Pointing-hand icon */}
-      <div style={{
-        fontSize: "4.8cqi", lineHeight: 1, flexShrink: 0,
-        transform: "rotate(-45deg)",
-      }}>
-        👉
-      </div>
+      {/* Officer icon */}
+      <img
+        src="/go_to_jail_officer.png"
+        alt="Go To Jail officer"
+        draggable={false}
+        style={{
+          width: "7cqi", height: "7cqi",
+          objectFit: "contain", flexShrink: 0,
+          userSelect: "none",
+        }}
+      />
 
       <span style={{
         fontSize: "1.55cqi", fontWeight: 900,
