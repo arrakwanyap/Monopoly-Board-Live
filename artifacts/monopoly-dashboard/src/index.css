@@ -1,4 +1,11 @@
 @import "tailwindcss";
+
+@font-face {
+  font-family: 'ITC Kabel Std';
+  src: url('/ITCKabelStd.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+}
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
 
@@ -98,7 +105,7 @@
   --chart-4: 280 55% 60%;
   --chart-5: 0 72% 55%;
 
-  --app-font-sans: 'Nunito', sans-serif;
+  --app-font-sans: 'ITC Kabel Std', 'Nunito', sans-serif;
   --app-font-serif: Georgia, serif;
   --app-font-mono: Menlo, monospace;
   --radius: 0.5rem;

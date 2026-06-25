@@ -57,7 +57,7 @@ const TILE_BORDER = "1px solid #001D61";
 const NAVY        = "#001D61";
 const RED         = "#ed1c24";
 const ORANGE      = "#f7941d";
-const KABEL       = "'Nunito', sans-serif";
+const KABEL       = "'ITC Kabel Std', 'Nunito', sans-serif";
 
 // ── Property tile ──────────────────────────────────────────────────────────
 function PropertyContent({ name, colorGroup, price }: {
