@@ -7,7 +7,7 @@ interface Props {
 }
 
 export function isTokenImage(emoji: string): boolean {
-  return emoji.startsWith("/tokens/");
+  return emoji.startsWith("/tokens/") || emoji.startsWith("/team_");
 }
 
 export default function TeamToken({ emoji, name, size = 28, className, style }: Props) {
