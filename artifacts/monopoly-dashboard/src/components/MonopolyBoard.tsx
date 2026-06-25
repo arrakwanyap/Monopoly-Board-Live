@@ -186,8 +186,7 @@ function GoContent() {
         fontSize: "1.2cqi", fontWeight: 800,
         color: NAVY, textAlign: "center",
         lineHeight: 1.25, textTransform: "uppercase",
-      }}>Collect $200 Salary 
-      as you pass</span>
+      }}>Collect $200 Salary<br />as you pass</span>
       <img
         src="/go_arrow.png"
         alt="GO arrow"
