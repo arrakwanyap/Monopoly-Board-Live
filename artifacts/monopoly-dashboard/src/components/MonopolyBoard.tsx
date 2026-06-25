@@ -178,27 +178,34 @@ function GoContent() {
       width: "100%", height: "100%",
       backgroundColor: TILE_BG,
       display: "flex", flexDirection: "column",
-      alignItems: "center", justifyContent: "center",
-      fontFamily: KABEL, gap: "0.3cqi", padding: "0.5cqi",
+      alignItems: "center", justifyContent: "space-between",
+      fontFamily: KABEL, padding: "0.8cqi 0.5cqi",
     }}>
       <span style={{
-        fontSize: "1.3cqi", fontWeight: 800,
+        fontSize: "1.2cqi", fontWeight: 800,
         color: NAVY, textAlign: "center",
         lineHeight: 1.25, textTransform: "uppercase",
       }}>
         Collect $200 Salary as you pass
       </span>
 
-      <img
-        src="/go_arrow.png"
-        alt="GO arrow"
-        draggable={false}
-        style={{
-          width: "13cqi", height: "7cqi",
-          objectFit: "contain", flexShrink: 0,
-          userSelect: "none",
-        }}
-      />
+      {/* Arrow — wrapper crops whitespace from image edges */}
+      <div style={{
+        width: "13cqi", height: "5cqi",
+        overflow: "hidden", flexShrink: 0,
+        display: "flex", alignItems: "center", justifyContent: "center",
+      }}>
+        <img
+          src="/go_arrow.png"
+          alt="GO arrow"
+          draggable={false}
+          style={{
+            width: "13cqi", height: "9cqi",
+            objectFit: "contain",
+            userSelect: "none",
+          }}
+        />
+      </div>
     </div>
   );
 }
@@ -265,14 +272,14 @@ function FreeParkingContent() {
       width: "100%", height: "100%",
       backgroundColor: TILE_BG,
       display: "flex", flexDirection: "column",
-      alignItems: "center", justifyContent: "center",
-      fontFamily: KABEL, gap: "0.3cqi", padding: "0.5cqi",
+      alignItems: "center", justifyContent: "space-between",
+      fontFamily: KABEL, padding: "0.8cqi 0.5cqi",
     }}>
       <span style={{
         fontSize: "1.5cqi", fontWeight: 900,
         color: RED, textTransform: "uppercase",
         letterSpacing: "0.06em", lineHeight: 1,
-        textAlign: "center",
+        textAlign: "center", flexShrink: 0,
       }}>
         FREE
       </span>
@@ -293,7 +300,7 @@ function FreeParkingContent() {
         fontSize: "1.5cqi", fontWeight: 900,
         color: NAVY, textTransform: "uppercase",
         letterSpacing: "0.06em", lineHeight: 1,
-        textAlign: "center",
+        textAlign: "center", flexShrink: 0,
       }}>
         PARKING
       </span>
@@ -308,14 +315,14 @@ function GoToJailContent() {
       width: "100%", height: "100%",
       backgroundColor: TILE_BG,
       display: "flex", flexDirection: "column",
-      alignItems: "center", justifyContent: "center",
-      fontFamily: KABEL, gap: "0.3cqi", padding: "0.5cqi",
+      alignItems: "center", justifyContent: "space-between",
+      fontFamily: KABEL, padding: "0.8cqi 0.5cqi",
     }}>
       <span style={{
         fontSize: "1.4cqi", fontWeight: 900,
         color: NAVY, textTransform: "uppercase",
         letterSpacing: "0.04em", lineHeight: 1,
-        textAlign: "center",
+        textAlign: "center", flexShrink: 0,
       }}>
         GO TO
       </span>
@@ -336,7 +343,7 @@ function GoToJailContent() {
         fontSize: "1.4cqi", fontWeight: 900,
         color: RED, textTransform: "uppercase",
         letterSpacing: "0.04em", lineHeight: 1,
-        textAlign: "center",
+        textAlign: "center", flexShrink: 0,
       }}>
         JAIL
       </span>
