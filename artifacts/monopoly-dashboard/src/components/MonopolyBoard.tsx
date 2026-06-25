@@ -177,11 +177,12 @@ function GoContent() {
     <div style={{
       width: "100%", height: "100%",
       backgroundColor: TILE_BG,
-      display: "flex", flexDirection: "column",
-      alignItems: "center", justifyContent: "space-between",
-      fontFamily: KABEL, padding: "0.8cqi 0.5cqi",
+      position: "relative",
+      fontFamily: KABEL, overflow: "hidden",
     }}>
       <span style={{
+        position: "absolute",
+        top: "0.8cqi", left: 0, right: 0,
         fontSize: "1.2cqi", fontWeight: 800,
         color: NAVY, textAlign: "center",
         lineHeight: 1.25, textTransform: "uppercase",
@@ -189,23 +190,19 @@ function GoContent() {
         Collect $200 Salary as you pass
       </span>
 
-      {/* Arrow — wrapper crops whitespace from image edges */}
-      <div style={{
-        width: "13cqi", height: "5cqi",
-        overflow: "hidden", flexShrink: 0,
-        display: "flex", alignItems: "center", justifyContent: "center",
-      }}>
-        <img
-          src="/go_arrow.png"
-          alt="GO arrow"
-          draggable={false}
-          style={{
-            width: "13cqi", height: "9cqi",
-            objectFit: "contain",
-            userSelect: "none",
-          }}
-        />
-      </div>
+      <img
+        src="/go_arrow.png"
+        alt="GO arrow"
+        draggable={false}
+        style={{
+          position: "absolute",
+          bottom: "0.5cqi", left: "50%",
+          transform: "translateX(-50%)",
+          width: "13cqi", height: "5cqi",
+          objectFit: "contain",
+          userSelect: "none",
+        }}
+      />
     </div>
   );
 }
@@ -271,36 +268,41 @@ function FreeParkingContent() {
     <div style={{
       width: "100%", height: "100%",
       backgroundColor: TILE_BG,
-      display: "flex", flexDirection: "column",
-      alignItems: "center", justifyContent: "space-between",
-      fontFamily: KABEL, padding: "0.8cqi 0.5cqi",
+      position: "relative",
+      fontFamily: KABEL, overflow: "hidden",
     }}>
       <span style={{
+        position: "absolute",
+        top: "0.8cqi", left: 0, right: 0,
         fontSize: "1.5cqi", fontWeight: 900,
         color: RED, textTransform: "uppercase",
         letterSpacing: "0.06em", lineHeight: 1,
-        textAlign: "center", flexShrink: 0,
+        textAlign: "center",
       }}>
         FREE
       </span>
 
-      {/* Car icon */}
       <img
         src="/free_parking_car.png"
         alt="Free Parking car"
         draggable={false}
         style={{
-          width: "4cqi", height: "4cqi",
-          objectFit: "contain", flexShrink: 0,
+          position: "absolute",
+          top: "50%", left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: "7cqi", height: "7cqi",
+          objectFit: "contain",
           userSelect: "none",
         }}
       />
 
       <span style={{
+        position: "absolute",
+        bottom: "0.8cqi", left: 0, right: 0,
         fontSize: "1.5cqi", fontWeight: 900,
         color: NAVY, textTransform: "uppercase",
         letterSpacing: "0.06em", lineHeight: 1,
-        textAlign: "center", flexShrink: 0,
+        textAlign: "center",
       }}>
         PARKING
       </span>
@@ -314,36 +316,41 @@ function GoToJailContent() {
     <div style={{
       width: "100%", height: "100%",
       backgroundColor: TILE_BG,
-      display: "flex", flexDirection: "column",
-      alignItems: "center", justifyContent: "space-between",
-      fontFamily: KABEL, padding: "0.8cqi 0.5cqi",
+      position: "relative",
+      fontFamily: KABEL, overflow: "hidden",
     }}>
       <span style={{
+        position: "absolute",
+        top: "0.8cqi", left: 0, right: 0,
         fontSize: "1.4cqi", fontWeight: 900,
         color: NAVY, textTransform: "uppercase",
         letterSpacing: "0.04em", lineHeight: 1,
-        textAlign: "center", flexShrink: 0,
+        textAlign: "center",
       }}>
         GO TO
       </span>
 
-      {/* Officer icon */}
       <img
         src="/go_to_jail_officer.png"
         alt="Go To Jail officer"
         draggable={false}
         style={{
-          width: "4cqi", height: "4cqi",
-          objectFit: "contain", flexShrink: 0,
+          position: "absolute",
+          top: "50%", left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: "7cqi", height: "7cqi",
+          objectFit: "contain",
           userSelect: "none",
         }}
       />
 
       <span style={{
+        position: "absolute",
+        bottom: "0.8cqi", left: 0, right: 0,
         fontSize: "1.4cqi", fontWeight: 900,
         color: RED, textTransform: "uppercase",
         letterSpacing: "0.04em", lineHeight: 1,
-        textAlign: "center", flexShrink: 0,
+        textAlign: "center",
       }}>
         JAIL
       </span>
