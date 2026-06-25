@@ -187,9 +187,9 @@ function GoContent() {
         draggable={false}
         style={{
           position: "absolute",
-          bottom: "0.2cqi", left: "50%",
+          bottom: "1.5cqi", left: "50%",
           transform: "translateX(-50%)",
-          width: "14cqi", height: "9cqi",
+          width: "15cqi", height: "10cqi",
           objectFit: "contain",
           userSelect: "none",
         }}
