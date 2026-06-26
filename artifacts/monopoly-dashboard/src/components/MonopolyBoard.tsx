@@ -524,13 +524,14 @@ export default function MonopolyBoard({ spaces, teams }: Props) {
             const pos = space.position;
             const [row, col] = getGridPos(pos);
             const { left, top, width, height } = getCellBounds(row, col);
-            // Place the badge near the colour-band end of each tile, which differs by side:
-            // bottom row (1-7):   band at bottom of cell → anchor bottom-left
-            // left col  (9-15):  band at right of cell  → anchor top-right
-            // top row   (17-23): band at top of cell    → anchor top-left  (default)
-            // right col (25-31): band at left of cell   → anchor top-left  (default)
+            // PropertyContent renders the colour band at the TOP of the tile (first 25% in flex column).
+            // After each side's rotation the band lands on a different CSS edge:
+            //   bottom row (1-7,  0°):    band at TOP   of cell → anchor top-left   (default)
+            //   left col   (9-15, 90°CW): band at RIGHT of cell → anchor top-right
+            //   top row    (17-23, 0°):   band at TOP   of cell → anchor top-left   (default)
+            //   right col  (25-31,-90°):  band at LEFT  of cell → anchor top-left   (default)
             const badgeLeft = (pos >= 9  && pos <= 15) ? left + width  * 0.78 : left + width  * 0.08;
-            const badgeTop  = (pos >= 1  && pos <= 7)  ? top  + height * 0.75 : top  + height * 0.06;
+            const badgeTop  = top + height * 0.06;
             return (
               <div key={`owner-${space.id}`} title={`Owned by ${space.ownerName ?? "?"}`}
                 style={{
