@@ -139,16 +139,24 @@ const WHEEL_SEGMENTS = [
   { label: "Pay Rent",  color: "#c0392b", textColor: "#fff" },
 ];
 
-function CollisionWheel() {
+interface CollisionWheelProps {
+  canExecute: boolean;
+  executing: boolean;
+  onExecute: (outcome: "Pay Rent" | "Take Over") => void;
+}
+
+function CollisionWheel({ canExecute, executing, onExecute }: CollisionWheelProps) {
   const [spinning, setSpinning] = useState(false);
   const [totalDeg, setTotalDeg] = useState(0);
   const [result, setResult] = useState<string | null>(null);
+  const [executed, setExecuted] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const spin = () => {
     if (spinning) return;
     setSpinning(true);
     setResult(null);
+    setExecuted(false);
 
     const n = WHEEL_SEGMENTS.length;
     const segDeg = 360 / n;
@@ -163,6 +171,13 @@ function CollisionWheel() {
       setSpinning(false);
       setResult(WHEEL_SEGMENTS[outcomeIdx].label);
     }, 4000);
+  };
+
+  const handleExecute = () => {
+    if (!result) return;
+    onExecute(result as "Pay Rent" | "Take Over");
+    setExecuted(true);
+    setResult(null);
   };
 
   useEffect(() => () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); }, []);
@@ -193,7 +208,6 @@ function CollisionWheel() {
   return (
     <div className="flex flex-col items-center gap-4">
       <div style={{ position: "relative", width: 220, height: 220 }}>
-        {/* Pointer */}
         <div style={{
           position: "absolute", top: -2, left: "50%",
           transform: "translateX(-50%)",
@@ -203,7 +217,6 @@ function CollisionWheel() {
           borderTop: "22px solid #f7941d",
           zIndex: 10, filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.5))",
         }} />
-        {/* Wheel SVG */}
         <svg
           viewBox="0 0 200 200"
           style={{
@@ -220,9 +233,7 @@ function CollisionWheel() {
               <text
                 x={tx} y={ty}
                 textAnchor="middle" dominantBaseline="middle"
-                fill={seg.textColor}
-                fontSize="9"
-                fontWeight="bold"
+                fill={seg.textColor} fontSize="9" fontWeight="bold"
                 transform={`rotate(${midDeg + 90}, ${tx}, ${ty})`}
                 style={{ pointerEvents: "none", userSelect: "none" }}
               >
@@ -234,16 +245,35 @@ function CollisionWheel() {
         </svg>
       </div>
 
-      <Btn variant="orange" className="px-8 py-2.5 text-sm" onClick={spin} disabled={spinning}>
-        {spinning ? "Spinning…" : "SPIN"}
+      <Btn variant="orange" className="px-8 py-2.5 text-sm" onClick={spin} disabled={spinning || !!result}>
+        {spinning ? "Spinning…" : executed ? "Spin Again" : "SPIN"}
       </Btn>
 
       {result && (
-        <div
-          className="text-center font-black text-xl px-6 py-3 rounded-xl border-2"
-          style={{ color: resultColor, borderColor: resultColor, backgroundColor: `${resultColor}22` }}
-        >
-          {result === "Pay Rent" ? "💸 Pay Rent!" : "🏠 Take Over!"}
+        <div className="w-full flex flex-col items-center gap-3">
+          <div
+            className="text-center font-black text-xl px-6 py-3 rounded-xl border-2 w-full"
+            style={{ color: resultColor, borderColor: resultColor, backgroundColor: `${resultColor}22` }}
+          >
+            {result === "Pay Rent" ? "💸 Pay Rent!" : "🏠 Take Over!"}
+          </div>
+          <Btn
+            variant={result === "Pay Rent" ? "orange" : "red"}
+            className="w-full py-2.5 text-sm font-bold"
+            onClick={handleExecute}
+            disabled={!canExecute || executing}
+          >
+            {!canExecute
+              ? "Select teams & property above first"
+              : executing
+              ? "Applying…"
+              : result === "Pay Rent"
+              ? "✓ Collect Rent"
+              : "✓ Transfer Ownership"}
+          </Btn>
+          {!canExecute && (
+            <p className="text-xs text-orange-400 text-center">Select a landing team and disputed property to execute.</p>
+          )}
         </div>
       )}
     </div>
@@ -256,11 +286,14 @@ function GameplayTab() {
   const qc = useQueryClient();
   const { data: teams } = useListTeams({ query: { refetchInterval: 5000 } });
   const { data: board } = useGetBoard({ query: { refetchInterval: 5000 } });
-  const updateTeam  = useUpdateTeam();
-  const createEvent = useCreateEvent();
+  const updateTeam     = useUpdateTeam();
+  const setOwnershipMut = useSetBoardSpaceOwnership();
+  const createEvent    = useCreateEvent();
 
-  const [moveTeamId, setMoveTeamId] = useState("");
-  const [movePos, setMovePos]       = useState("0");
+  const [moveTeamId, setMoveTeamId]           = useState("");
+  const [movePos, setMovePos]                 = useState("0");
+  const [collisionTeamId, setCollisionTeamId] = useState("");
+  const [collisionPropId, setCollisionPropId] = useState("");
 
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: getListTeamsQueryKey() });
@@ -289,9 +322,67 @@ function GameplayTab() {
     );
   };
 
-  const movedTeam  = teams?.find(t => t.id === parseInt(moveTeamId));
+  const handleCollisionExecute = (outcome: "Pay Rent" | "Take Over") => {
+    const landingTeam = teams?.find(t => t.id === parseInt(collisionTeamId));
+    const prop        = board?.find(s => s.id === parseInt(collisionPropId));
+    const ownerTeam   = teams?.find(t => t.id === prop?.ownerId);
+    if (!landingTeam || !prop || !ownerTeam) return;
+
+    if (outcome === "Pay Rent") {
+      const rent = prop.rentValue;
+      updateTeam.mutate(
+        { id: landingTeam.id, data: { cash: Math.max(0, landingTeam.cash - rent) } },
+        {
+          onSuccess: () => {
+            updateTeam.mutate(
+              { id: ownerTeam.id, data: { cash: ownerTeam.cash + rent } },
+              {
+                onSuccess: () => {
+                  createEvent.mutate({
+                    data: {
+                      message: `${landingTeam.name} paid $${rent} rent to ${ownerTeam.name} for ${prop.name}`,
+                      type: "cash_change",
+                      teamId: landingTeam.id,
+                      amount: -rent,
+                    },
+                  });
+                  invalidate();
+                },
+              }
+            );
+          },
+        }
+      );
+    } else {
+      setOwnershipMut.mutate(
+        { id: prop.id, data: { ownerId: landingTeam.id, hasHotel: false } },
+        {
+          onSuccess: () => {
+            createEvent.mutate({
+              data: {
+                message: `${landingTeam.name} took over ${prop.name} from ${ownerTeam.name}!`,
+                type: "takeover",
+                teamId: landingTeam.id,
+              },
+            });
+            invalidate();
+          },
+        }
+      );
+    }
+  };
+
+  const movedTeam   = teams?.find(t => t.id === parseInt(moveTeamId));
   const targetSpace = board?.find(s => s.position === parseInt(movePos));
-  const isOwned    = !!(targetSpace?.ownerId && targetSpace.ownerId !== parseInt(moveTeamId));
+  const isOwned     = !!(targetSpace?.ownerId && targetSpace.ownerId !== parseInt(moveTeamId));
+
+  // Collision wheel derived state
+  const ownedByOthers = board?.filter(
+    s => s.type === "property" && s.ownerId && s.ownerId !== parseInt(collisionTeamId)
+  ) ?? [];
+  const collisionProp  = board?.find(s => s.id === parseInt(collisionPropId));
+  const collisionOwner = teams?.find(t => t.id === collisionProp?.ownerId);
+  const collisionReady = !!collisionTeamId && !!collisionPropId && !!collisionProp && !!collisionOwner;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -388,11 +479,55 @@ function GameplayTab() {
       {/* Collision Wheel */}
       <div className={card}>
         <SectionHeader title="Collision Wheel" />
-        <p className="text-xs text-muted-foreground mb-4">
+        <p className="text-xs text-muted-foreground mb-3">
           Spin when a team lands on a property owned by another team.
           <br />2 in 3 chance to pay rent · 1 in 3 chance to take over.
         </p>
-        <CollisionWheel />
+
+        {/* Selectors */}
+        <div className="flex flex-col gap-2 mb-4">
+          <div>
+            <label className={lbl}>Landing Team</label>
+            <select className={sel} value={collisionTeamId} onChange={e => { setCollisionTeamId(e.target.value); setCollisionPropId(""); }}>
+              <option value="">Select team…</option>
+              {teams?.map(t => (
+                <option key={t.id} value={t.id}>{t.name}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className={lbl}>Disputed Property</label>
+            <select className={sel} value={collisionPropId} onChange={e => setCollisionPropId(e.target.value)} disabled={!collisionTeamId}>
+              <option value="">{collisionTeamId ? "Select property…" : "Pick a team first"}</option>
+              {ownedByOthers.map(s => (
+                <option key={s.id} value={s.id}>
+                  {s.name} — owned by {s.ownerName}
+                </option>
+              ))}
+            </select>
+          </div>
+          {collisionProp && collisionOwner && (
+            <div className="rounded-lg p-3 bg-background border border-border text-xs flex flex-col gap-1">
+              <div className="font-bold text-foreground text-sm">{collisionProp.name}</div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: (collisionProp as any).ownerColor ?? "#fff" }} />
+                <span className="text-muted-foreground">Owner: <strong className="text-foreground">{collisionOwner.name}</strong></span>
+                {collisionProp.rentValue > 0 && (
+                  <span className="text-muted-foreground ml-auto">Rent: <strong className="text-green-400">${collisionProp.rentValue}</strong></span>
+                )}
+              </div>
+            </div>
+          )}
+          {collisionTeamId && ownedByOthers.length === 0 && (
+            <p className="text-xs text-muted-foreground italic">No properties owned by other teams yet.</p>
+          )}
+        </div>
+
+        <CollisionWheel
+          canExecute={collisionReady}
+          executing={updateTeam.isPending || setOwnershipMut.isPending}
+          onExecute={handleCollisionExecute}
+        />
       </div>
     </div>
   );
