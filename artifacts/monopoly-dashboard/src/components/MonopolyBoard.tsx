@@ -543,7 +543,7 @@ export default function MonopolyBoard({ spaces, teams }: Props) {
                 <CircleToken
                   emoji={(space as any).ownerEmoji as string}
                   name={space.ownerName ?? ""}
-                  sizeCqi={4.5}
+                  sizeCqi={3}
                   borderColor={(space as any).ownerColor ?? NAVY}
                 />
               </div>
