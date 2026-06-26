@@ -879,6 +879,34 @@ function TeamsTab() {
               </Btn>
             </div>
 
+            {/* Properties owned */}
+            {(() => {
+              const owned = (board ?? []).filter(s => s.type === "property" && s.ownerId === team.id);
+              if (owned.length === 0) return null;
+              const colorHex: Record<string, string> = {
+                brown:"#8B4513", light_blue:"#87CEEB", pink:"#FF69B4",
+                orange:"#FFA500", red:"#FF0000", yellow:"#FFD700",
+                green:"#00A550", dark_blue:"#003087",
+              };
+              return (
+                <div>
+                  <div className={`${lbl} mb-1.5`}>Properties owned ({owned.length})</div>
+                  <div className="flex flex-col gap-1">
+                    {owned.map(s => (
+                      <div key={s.id} className="flex items-center gap-2 text-xs text-foreground">
+                        <span
+                          className="w-2.5 h-2.5 rounded-sm shrink-0"
+                          style={{ backgroundColor: colorHex[(s as any).colorGroup] ?? "#ccc" }}
+                        />
+                        <span className="truncate">{s.name}</span>
+                        {(s as any).hasHotel && <span className="ml-auto text-yellow-400 font-bold shrink-0">🏨</span>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+
             {/* Send to corner */}
             <div>
               <div className={`${lbl} mb-1.5`}>Send to corner</div>
