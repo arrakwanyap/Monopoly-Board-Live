@@ -27,17 +27,37 @@ const CORNERS = [
   { pos: 24, label: "Go To Jail",   color: "#ed1c24" },
 ];
 
-const CHANCE_CARDS = [
-  { text: "Advance to GO — collect $200",          amount: 200,  moveTo: 0 },
-  { text: "Bank error in your favour — collect $200", amount: 200 },
-  { text: "Pay hospital fees — lose $100",          amount: -100 },
-  { text: "Pay school fees — lose $150",            amount: -150 },
-  { text: "Speeding fine — lose $15",               amount: -15  },
-  { text: "Won crossword competition — collect $100", amount: 100 },
-  { text: "Go to Jail",                             amount: 0,   moveTo: 8 },
-  { text: "Building loan matures — collect $150",   amount: 150  },
-  { text: "Poor tax — lose $15",                    amount: -15  },
-  { text: "Street repairs assessment — lose $40",   amount: -40  },
+interface ChanceCard {
+  num: number;
+  text: string;
+  amount?: number;
+  moveTo?: number;
+  moveBy?: number;
+  passGo?: boolean;
+  physical?: boolean;
+}
+
+const CHANCE_CARDS: ChanceCard[] = [
+  { num: 1,  text: "Advance to the Auditorium. If you pass Go, collect $200.", moveTo: 31, passGo: true },
+  { num: 2,  text: "You win first prize in a music competition. Collect $100.", amount: 100 },
+  { num: 3,  text: "You make donations to upgrade school facilities. Pay $100.", amount: -100 },
+  { num: 4,  text: "You have not completed your report cards on time. Go back 3 spaces.", moveBy: -3 },
+  { num: 5,  text: "Go to Jail. Go directly to Jail. Do not pass Go. Do not collect $200.", moveTo: 8 },
+  { num: 6,  text: "Get out of Jail Free Card. (Physical card issued — no digital effect.)", physical: true },
+  { num: 7,  text: "Pay $50 to buy morning coffee for your department.", amount: -50 },
+  { num: 8,  text: "You are selected as Teacher of the Year. Collect prize of $100.", amount: 100 },
+  { num: 9,  text: "You lose your staff ID and need to purchase a new one. Pay $50.", amount: -50 },
+  { num: 10, text: "You travel to the primary campus and are caught jaywalking. Pay $150.", amount: -150 },
+  { num: 11, text: "The copier jams on your print order on the morning of final exams. Pay $50 to buy a coffee for the ITD team member who bails you out.", amount: -50 },
+  { num: 12, text: "Your after school club wins a regional tournament! Collect $100 for the club budget.", amount: 100 },
+  { num: 13, text: "Your classroom decorations look so spectacular for the school open day, three new families enroll on the spot. Collect $200 as a bonus.", amount: 200 },
+  { num: 14, text: "Your classroom furniture needs an upgrade. Pay $150.", amount: -150 },
+  { num: 15, text: "Your class went through supplies faster than expected. Pay $80 for emergency supplies.", amount: -80 },
+  { num: 16, text: "You completed your mandatory child protection training early. Collect $50.", amount: 50 },
+  { num: 17, text: "It's Chinese New Year! Collect $88 in red pocket money.", amount: 88 },
+  { num: 18, text: "A student brought you a shiny rock. It boosts your morale. Advance 3 spaces.", moveBy: 3 },
+  { num: 19, text: "You left your laptop charger at home. Pay $50.", amount: -50 },
+  { num: 20, text: "You spilled coffee down your shirt 5 minutes before parent-teacher conferences. Pay $50 to buy a new shirt from Festival Walk.", amount: -50 },
 ];
 
 // ── Shared UI helpers ────────────────────────────────────────────────────────
@@ -294,6 +314,9 @@ function GameplayTab() {
   const [movePos, setMovePos]                 = useState("0");
   const [collisionTeamId, setCollisionTeamId] = useState("");
   const [collisionPropId, setCollisionPropId] = useState("");
+  const [chanceTeamId, setChanceTeamId]       = useState("");
+  const [chanceCardNum, setChanceCardNum]     = useState<number | null>(null);
+  const [chanceApplied, setChanceApplied]     = useState(false);
 
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: getListTeamsQueryKey() });
@@ -365,6 +388,105 @@ function GameplayTab() {
                 teamId: landingTeam.id,
               },
             });
+            invalidate();
+          },
+        }
+      );
+    }
+  };
+
+  const handleChanceApply = () => {
+    if (!chanceTeamId || chanceCardNum === null) return;
+    const team = teams?.find(t => t.id === parseInt(chanceTeamId));
+    if (!team) return;
+    const card2 = CHANCE_CARDS.find(c => c.num === chanceCardNum);
+    if (!card2) return;
+
+    const BOARD_SIZE = 32;
+
+    if (card2.physical) {
+      createEvent.mutate({
+        data: {
+          message: `${team.name} drew Chance #${card2.num}: Get Out of Jail Free (physical card issued)`,
+          type: "system",
+          teamId: team.id,
+        },
+      });
+      setChanceApplied(true);
+      invalidate();
+      return;
+    }
+
+    if (card2.moveTo !== undefined) {
+      const target = card2.moveTo;
+      const passedGo = card2.passGo && team.position > target;
+      const newCash = passedGo ? team.cash + 200 : team.cash;
+      const applyMove = (cashAfterGo: number) => {
+        updateTeam.mutate(
+          { id: team.id, data: { position: target, cash: cashAfterGo } },
+          {
+            onSuccess: () => {
+              const spaceName = board?.find(s => s.position === target)?.name ?? `position ${target}`;
+              const goMsg = passedGo ? " (collected $200 passing Go)" : "";
+              createEvent.mutate({
+                data: {
+                  message: `${team.name} drew Chance #${card2.num} — moved to ${spaceName}${goMsg}`,
+                  type: "system",
+                  teamId: team.id,
+                },
+              });
+              setChanceApplied(true);
+              invalidate();
+            },
+          }
+        );
+      };
+      applyMove(newCash);
+      return;
+    }
+
+    if (card2.moveBy !== undefined) {
+      const delta = card2.moveBy;
+      const newPos = ((team.position + delta) % BOARD_SIZE + BOARD_SIZE) % BOARD_SIZE;
+      updateTeam.mutate(
+        { id: team.id, data: { position: newPos } },
+        {
+          onSuccess: () => {
+            const spaceName = board?.find(s => s.position === newPos)?.name ?? `position ${newPos}`;
+            const dir = delta > 0 ? `forward ${delta}` : `back ${Math.abs(delta)}`;
+            createEvent.mutate({
+              data: {
+                message: `${team.name} drew Chance #${card2.num} — moved ${dir} spaces to ${spaceName}`,
+                type: "system",
+                teamId: team.id,
+              },
+            });
+            setChanceApplied(true);
+            invalidate();
+          },
+        }
+      );
+      return;
+    }
+
+    if (card2.amount !== undefined) {
+      const amt = card2.amount;
+      const newCash = Math.max(0, team.cash + amt);
+      updateTeam.mutate(
+        { id: team.id, data: { cash: newCash } },
+        {
+          onSuccess: () => {
+            createEvent.mutate({
+              data: {
+                message: amt > 0
+                  ? `${team.name} drew Chance #${card2.num} — collected $${amt}`
+                  : `${team.name} drew Chance #${card2.num} — paid $${Math.abs(amt)}`,
+                type: "cash_change",
+                teamId: team.id,
+                amount: amt,
+              },
+            });
+            setChanceApplied(true);
             invalidate();
           },
         }
@@ -528,6 +650,121 @@ function GameplayTab() {
           executing={updateTeam.isPending || setOwnershipMut.isPending}
           onExecute={handleCollisionExecute}
         />
+      </div>
+
+      {/* Chance Cards */}
+      <div className={`${card} col-span-1 lg:col-span-2`}>
+        <SectionHeader title="Chance Cards" />
+        <p className="text-xs text-muted-foreground mb-4">
+          Select the team that drew the card, pick the card number, then apply its effect.
+        </p>
+
+        <div className="flex flex-col gap-4">
+          {/* Team selector */}
+          <div className="flex gap-3 items-end">
+            <div className="flex-1">
+              <label className={lbl}>Team Drawing Chance</label>
+              <select
+                className={sel}
+                value={chanceTeamId}
+                onChange={e => { setChanceTeamId(e.target.value); setChanceCardNum(null); setChanceApplied(false); }}
+              >
+                <option value="">Select team…</option>
+                {teams?.map(t => (
+                  <option key={t.id} value={t.id}>{t.name}</option>
+                ))}
+              </select>
+            </div>
+            <Btn
+              variant="gray"
+              onClick={() => {
+                const r = Math.floor(Math.random() * CHANCE_CARDS.length);
+                setChanceCardNum(CHANCE_CARDS[r].num);
+                setChanceApplied(false);
+              }}
+              disabled={!chanceTeamId}
+            >
+              🎲 Draw Random
+            </Btn>
+          </div>
+
+          {/* Card list */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-72 overflow-y-auto pr-1">
+            {CHANCE_CARDS.map(c => {
+              const isSelected = chanceCardNum === c.num;
+              const tag = c.physical
+                ? { label: "physical", cls: "bg-purple-900/60 text-purple-300" }
+                : c.moveTo !== undefined
+                ? { label: "move", cls: "bg-blue-900/60 text-blue-300" }
+                : c.moveBy !== undefined
+                ? { label: c.moveBy > 0 ? `+${c.moveBy} spaces` : `${c.moveBy} spaces`, cls: "bg-cyan-900/60 text-cyan-300" }
+                : c.amount! > 0
+                ? { label: `+$${c.amount}`, cls: "bg-green-900/60 text-green-300" }
+                : { label: `-$${Math.abs(c.amount!)}`, cls: "bg-red-900/60 text-red-300" };
+
+              return (
+                <button
+                  key={c.num}
+                  onClick={() => { setChanceCardNum(isSelected ? null : c.num); setChanceApplied(false); }}
+                  disabled={!chanceTeamId}
+                  className={`text-left rounded-lg px-3 py-2 border transition-all text-xs disabled:opacity-40 disabled:cursor-not-allowed ${
+                    isSelected
+                      ? "border-blue-500 bg-blue-950/60 ring-1 ring-blue-500"
+                      : "border-border bg-background hover:border-blue-500/50 hover:bg-blue-950/20"
+                  }`}
+                >
+                  <div className="flex items-start gap-2">
+                    <span className="font-black text-foreground shrink-0 w-5 text-center">{c.num}</span>
+                    <span className="text-muted-foreground leading-relaxed flex-1 line-clamp-2">{c.text}</span>
+                    <span className={`shrink-0 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase ${tag.cls}`}>
+                      {tag.label}
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Selected card preview + apply */}
+          {chanceCardNum !== null && (() => {
+            const c = CHANCE_CARDS.find(x => x.num === chanceCardNum)!;
+            const team = teams?.find(t => t.id === parseInt(chanceTeamId));
+            const effectDesc = c.physical
+              ? "Issue physical card — no cash or position change."
+              : c.moveTo !== undefined
+              ? `Move to ${board?.find(s => s.position === c.moveTo)?.name ?? `position ${c.moveTo}`}${c.passGo && team && team.position > c.moveTo! ? " + collect $200 (passed Go)" : ""}.`
+              : c.moveBy !== undefined
+              ? `Move ${c.moveBy > 0 ? `forward ${c.moveBy}` : `back ${Math.abs(c.moveBy)}`} spaces.`
+              : c.amount! > 0
+              ? `Add $${c.amount} to team cash.`
+              : `Deduct $${Math.abs(c.amount!)} from team cash.`;
+
+            return (
+              <div className="rounded-lg border border-blue-500/40 bg-blue-950/30 p-3 flex flex-col gap-2">
+                <div className="flex gap-2 items-start">
+                  <span className="text-blue-400 text-lg leading-none">?</span>
+                  <div>
+                    <div className="text-xs font-bold text-foreground mb-0.5">Card #{c.num}</div>
+                    <div className="text-xs text-muted-foreground leading-relaxed">{c.text}</div>
+                    <div className="mt-1 text-xs font-semibold text-blue-300">Effect: {effectDesc}</div>
+                  </div>
+                </div>
+                {chanceApplied ? (
+                  <div className="text-xs font-bold text-green-400 text-center py-1">✓ Applied successfully</div>
+                ) : (
+                  <Btn
+                    variant="blue"
+                    className="w-full py-2"
+                    onClick={handleChanceApply}
+                    disabled={!chanceTeamId || updateTeam.isPending}
+                  >
+                    {updateTeam.isPending ? "Applying…" : `Apply to ${team?.name ?? "Team"}`}
+                  </Btn>
+                )}
+              </div>
+            );
+          })()}
+        </div>
       </div>
     </div>
   );
@@ -947,10 +1184,11 @@ function EventsTab() {
   const handleApplyChance = () => {
     if (!drawnCard || !team) return;
     const updates: Array<() => void> = [];
-    if (drawnCard.amount !== 0) {
+    if (drawnCard.amount !== undefined && drawnCard.amount !== 0) {
+      const amt = drawnCard.amount;
       updates.push(() => {
         updateTeam.mutate(
-          { id: team.id, data: { cash: Math.max(0, team.cash + drawnCard.amount) } },
+          { id: team.id, data: { cash: Math.max(0, team.cash + amt) } },
           { onSuccess: invalidate }
         );
       });
@@ -1058,7 +1296,7 @@ function EventsTab() {
           <div className="mt-4 p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/30 flex flex-col gap-3">
             <div className="text-sm font-bold text-yellow-400">🎴 Chance Card Drawn!</div>
             <div className="text-foreground">{drawnCard.text}</div>
-            {drawnCard.amount !== 0 && (
+            {drawnCard.amount !== undefined && drawnCard.amount !== 0 && (
               <div className={`text-sm font-bold ${drawnCard.amount > 0 ? "text-green-400" : "text-red-400"}`}>
                 {drawnCard.amount > 0 ? `+$${drawnCard.amount}` : `-$${Math.abs(drawnCard.amount)}`}
               </div>
