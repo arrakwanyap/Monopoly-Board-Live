@@ -527,9 +527,9 @@ export default function MonopolyBoard({ spaces, teams }: Props) {
               <div key={`owner-${space.id}`} title={`Owned by ${space.ownerName ?? "?"}`}
                 style={{
                   position: "absolute",
-                  left: `${left + width / 2}%`,
-                  top:  `${top + height * 0.22}%`,
-                  transform: "translate(-50%,-50%)", zIndex: 12,
+                  left: `${left + width * 0.08}%`,
+                  top:  `${top + height * 0.06}%`,
+                  transform: "none", zIndex: 12,
                 }}>
                 <CircleToken
                   emoji={(space as any).ownerEmoji as string}
