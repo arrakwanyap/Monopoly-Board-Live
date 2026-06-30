@@ -660,26 +660,59 @@ export default function MonopolyBoard({ spaces, teams }: Props) {
           const { left, top, width, height } = getCellBounds(row, col);
           const rotation = getTileRotation(pos);
 
-          // Anchor at the "price-row corner" of the readable tile face
-          // so the token sits in the bottom-right without covering the name.
-          // Each rotation maps the unrotated price area to a different CSS corner:
-          //   0°   (bottom/top rows) → price at CSS bottom  → anchor right-bottom
-          //   90°  (left column)     → price at CSS left    → anchor left-bottom
-          //   -90° (right column)    → price at CSS right   → anchor right-bottom
-          let fx = 0.78;
-          if (rotation === 90)  fx = 0.18;
-          if (rotation === -90) fx = 0.82;
-          const fy = 0.80;
+          // Free Parking (16) and Go To Jail (24) — centered on the tile
+          if (CORNER_POSITIONS.has(pos)) {
+            return (
+              <div key={`tokens-${pos}`} style={{
+                position: "absolute",
+                left: `${left + width * 0.5}%`,
+                top:  `${top  + height * 0.5}%`,
+                transform: "translate(-50%, -50%)",
+                display: "flex", flexWrap: "wrap",
+                justifyContent: "center", alignItems: "center",
+                gap: "0.5cqi", width: "13cqi",
+                zIndex: 20,
+              }}>
+                {here.map(team => (
+                  <div key={team.id} title={team.name}>
+                    <CircleToken emoji={team.emoji} name={team.name} sizeCqi={6} />
+                  </div>
+                ))}
+              </div>
+            );
+          }
+
+          // Property / chance / tax tiles — anchor to the "price-row corner"
+          // of the readable tile face so tokens don't cover the location name.
+          //
+          // The container's far corner (bottom-right for 0°/-90°, bottom-left
+          // for 90°) is pinned to the anchor so it always grows inward and
+          // never overflows the tile edge.
+          //
+          //   0°   (bottom/top rows) → price at CSS bottom-right → anchor there,  grow ←↑
+          //   90°  (left column)     → price at CSS bottom-left  → anchor there,  grow →↑
+          //   -90° (right column)    → price at CSS bottom-right → anchor there,  grow ←↑
+          let anchorFx: number, anchorFy: number, xform: string;
+          if (rotation === 90) {
+            anchorFx = 0.06; anchorFy = 0.92;
+            xform = "translate(0%, -100%)";   // container left edge at anchor, grows right+up
+          } else if (rotation === -90) {
+            anchorFx = 0.94; anchorFy = 0.92;
+            xform = "translate(-100%, -100%)"; // container right edge at anchor, grows left+up
+          } else {
+            anchorFx = 0.94; anchorFy = 0.92;
+            xform = "translate(-100%, -100%)"; // container right edge at anchor, grows left+up
+          }
 
           return (
             <div key={`tokens-${pos}`} style={{
               position: "absolute",
-              left: `${left + width * fx}%`,
-              top:  `${top  + height * fy}%`,
-              transform: "translate(-50%, -50%)",
-              display: "flex", flexWrap: "wrap",
-              gap: "0.3cqi", width: "9.5cqi",
-              justifyContent: "center",
+              left: `${left + width  * anchorFx}%`,
+              top:  `${top  + height * anchorFy}%`,
+              transform: xform,
+              display: "flex", flexWrap: "wrap-reverse",
+              gap: "0.3cqi",
+              maxWidth: `${width * 0.88}cqi`,
               zIndex: 20,
             }}>
               {here.map(team => (
