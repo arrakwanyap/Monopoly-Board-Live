@@ -53,13 +53,16 @@ const TEAM_CORRECTIONS: Array<{
   id: number;
   name: string;
   color: string;
+  emoji: string;
 }> = [
-  { id: 1, name: "Sabretooth", color: "#f5a623" },
-  { id: 4, name: "Dragon",     color: "#e74c3c" },
-  { id: 5, name: "Panda",      color: "#87ceeb" },
-  { id: 6, name: "Tiger",      color: "#8e44ad" },
-  { id: 7, name: "Rooster",    color: "#2ecc71" },
-  { id: 8, name: "Lion",       color: "#f1c40f" },
+  { id: 1, name: "Sabretooth", color: "#f5a623", emoji: "/team_sabretooth.png" },
+  { id: 2, name: "Phoenix",    color: "#e74c3c", emoji: "/team_phoenix.png"    },
+  { id: 3, name: "Unicorn",    color: "#2980b9", emoji: "/team_unicorn.png"    },
+  { id: 4, name: "Dragon",     color: "#e74c3c", emoji: "/team_dragon.png"     },
+  { id: 5, name: "Panda",      color: "#87ceeb", emoji: "/team_panda.png"      },
+  { id: 6, name: "Tiger",      color: "#8e44ad", emoji: "/team_tiger.png"      },
+  { id: 7, name: "Rooster",    color: "#2ecc71", emoji: "/team_rooster.png"    },
+  { id: 8, name: "Lion",       color: "#f1c40f", emoji: "/team_lion.png"       },
 ];
 
 export async function runDataMigration(): Promise<void> {
@@ -90,7 +93,7 @@ export async function runDataMigration(): Promise<void> {
     for (const fix of TEAM_CORRECTIONS) {
       await db
         .update(teamsTable)
-        .set({ name: fix.name, color: fix.color })
+        .set({ name: fix.name, color: fix.color, emoji: fix.emoji })
         .where(eq(teamsTable.id, fix.id));
     }
 
