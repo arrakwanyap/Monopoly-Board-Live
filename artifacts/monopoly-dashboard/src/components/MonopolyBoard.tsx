@@ -268,7 +268,7 @@ function JailContent() {
       <div style={{
         flexShrink: 0,
         backgroundColor: ORANGE,
-        padding: "0.55cqi 0.3cqi",
+        padding: "1.1cqi 0.3cqi",
         display: "flex", alignItems: "center", justifyContent: "center",
       }}>
         <span style={{
@@ -583,11 +583,15 @@ export default function MonopolyBoard({ spaces, teams }: Props) {
 
           if (isSmallCorner) {
             const { left, top, width, height } = getCellBounds(row, col);
+            // pos 8 (JAIL): anchor tokens in the left side of the "Just Visiting" strip
+            // pos 0 (GO): keep centered
+            const anchorFx = pos === 8 ? 0.26 : 0.5;
+            const anchorFy = pos === 8 ? 0.88 : 0.5;
             return (
               <div key={`tokens-${pos}`} style={{
                 position: "absolute",
-                left: `${left + width / 2}%`,
-                top: `${top + height / 2}%`,
+                left: `${left + width * anchorFx}%`,
+                top: `${top + height * anchorFy}%`,
                 transform: "translate(-50%, -50%)",
                 display: "flex", flexWrap: "wrap",
                 justifyContent: "center", alignItems: "center",
