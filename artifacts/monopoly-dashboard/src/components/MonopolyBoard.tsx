@@ -576,10 +576,12 @@ export default function MonopolyBoard({ spaces, teams }: Props) {
 
         {Object.entries(teamsByPosition).map(([posStr, here]) => {
           const pos = parseInt(posStr, 10);
-          const isCornerPos = CORNER_POSITIONS.has(pos);
+          // Only GO (0) and JAIL (8) use the clustered small-token layout.
+          // Free Parking (16) and Go To Jail (24) use the same spread layout as property tiles.
+          const isSmallCorner = pos === 0 || pos === 8;
           const [row, col] = getGridPos(pos);
 
-          if (isCornerPos) {
+          if (isSmallCorner) {
             const { left, top, width, height } = getCellBounds(row, col);
             return (
               <div key={`tokens-${pos}`} style={{
