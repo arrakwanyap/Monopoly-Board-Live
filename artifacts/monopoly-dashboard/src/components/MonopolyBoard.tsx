@@ -616,27 +616,38 @@ export default function MonopolyBoard({ spaces, teams }: Props) {
             );
           }
 
-          const cx = AXIS_CENTERS[col];
-          const cy = AXIS_CENTERS[row];
-          const spreadRadius = here.length <= 3 ? 2.0 : 2.6;
+          const { left, top, width, height } = getCellBounds(row, col);
+          const rotation = getTileRotation(pos);
 
-          return here.map((team, idx) => {
-            let dx = 0, dy = 0;
-            if (here.length > 1) {
-              const angle = (idx / here.length) * 2 * Math.PI - Math.PI / 2;
-              dx = Math.cos(angle) * spreadRadius;
-              dy = Math.sin(angle) * spreadRadius;
-            }
-            return (
-              <div key={team.id} title={team.name} style={{
-                position: "absolute",
-                left: `${cx + dx}%`, top: `${cy + dy}%`,
-                transform: "translate(-50%,-50%)", zIndex: 20,
-              }}>
-                <CircleToken emoji={team.emoji} name={team.name} sizeCqi={6} />
-              </div>
-            );
-          });
+          // Anchor at the "price-row corner" of the readable tile face
+          // so the token sits in the bottom-right without covering the name.
+          // Each rotation maps the unrotated price area to a different CSS corner:
+          //   0°   (bottom/top rows) → price at CSS bottom  → anchor right-bottom
+          //   90°  (left column)     → price at CSS left    → anchor left-bottom
+          //   -90° (right column)    → price at CSS right   → anchor right-bottom
+          let fx = 0.78;
+          if (rotation === 90)  fx = 0.18;
+          if (rotation === -90) fx = 0.82;
+          const fy = 0.80;
+
+          return (
+            <div key={`tokens-${pos}`} style={{
+              position: "absolute",
+              left: `${left + width * fx}%`,
+              top:  `${top  + height * fy}%`,
+              transform: "translate(-50%, -50%)",
+              display: "flex", flexWrap: "wrap",
+              gap: "0.3cqi", width: "9.5cqi",
+              justifyContent: "center",
+              zIndex: 20,
+            }}>
+              {here.map(team => (
+                <div key={team.id} title={team.name}>
+                  <CircleToken emoji={team.emoji} name={team.name} sizeCqi={4.5} />
+                </div>
+              ))}
+            </div>
+          );
         })}
       </div>
     </div>
