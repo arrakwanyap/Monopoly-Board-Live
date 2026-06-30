@@ -239,10 +239,11 @@ function JailContent() {
     }}>
       {/* Main area: jail cell */}
       <div style={{
-        flex: 1,
+        flex: 1, minHeight: 0,
         display: "flex", flexDirection: "column",
         alignItems: "center", justifyContent: "center",
-        gap: "0.5cqi", padding: "0.6cqi",
+        gap: "0.4cqi", padding: "0.4cqi",
+        overflow: "hidden",
       }}>
         {/* In Jail image */}
         <img
@@ -250,13 +251,13 @@ function JailContent() {
           alt="In Jail"
           draggable={false}
           style={{
-            width: "10cqi", height: "10cqi",
+            width: "8cqi", height: "8cqi",
             objectFit: "contain", flexShrink: 0,
             userSelect: "none",
           }}
         />
         <span style={{
-          fontSize: "1.4cqi", fontWeight: 900,
+          fontSize: "1.3cqi", fontWeight: 900,
           color: RED, textTransform: "uppercase",
           textAlign: "center", lineHeight: 1.1,
         }}>
@@ -267,8 +268,8 @@ function JailContent() {
       {/* Bottom strip — JUST VISITING */}
       <div style={{
         flexShrink: 0,
+        height: "26%",
         backgroundColor: ORANGE,
-        padding: "1.1cqi 0.3cqi",
         display: "flex", alignItems: "center", justifyContent: "center",
       }}>
         <span style={{
