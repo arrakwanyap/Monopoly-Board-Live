@@ -147,7 +147,7 @@ function ChanceContent() {
 }
 
 // ── Tax / Fee tile ──────────────────────────────────────────────────────────
-function TaxContent({ name }: { name: string }) {
+function TaxContent({ name, fee }: { name: string; fee?: number }) {
   return (
     <div style={{
       width: "100%", height: "100%",
@@ -157,7 +157,7 @@ function TaxContent({ name }: { name: string }) {
       gap: "0.3cqi", padding: "0.4cqi",
       fontFamily: KABEL,
     }}>
-      <span style={{ fontSize: "2.8cqi", lineHeight: 1 }} className="text-[40px]">💰</span>
+      <span style={{ fontSize: "2.8cqi", lineHeight: 1 }}>💰</span>
       <span style={{
         fontSize: "0.9cqi", fontWeight: 700,
         textAlign: "center", color: "#333",
@@ -166,6 +166,15 @@ function TaxContent({ name }: { name: string }) {
       }}>
         {name}
       </span>
+      {fee != null && fee > 0 && (
+        <span style={{
+          fontSize: "1.1cqi", fontWeight: 900,
+          color: NAVY, marginTop: "auto",
+          letterSpacing: "0.03em",
+        }}>
+          ${fee}
+        </span>
+      )}
     </div>
   );
 }
@@ -391,7 +400,7 @@ function BoardTile({ space }: { space: BoardSpace }) {
   } else if (space.type === "chance") {
     content = <ChanceContent />;
   } else if (space.type === "tax") {
-    content = <TaxContent name={space.name} />;
+    content = <TaxContent name={space.name} fee={space.rentValue || undefined} />;
   } else {
     content = (
       <div style={{
@@ -503,7 +512,7 @@ export default function MonopolyBoard({ spaces, teams }: Props) {
       {/* Overlays: highlight frames + ownership badges + team tokens */}
       <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
 
-        {propertySpaces.map((space) => {
+        {spaces.filter(s => !CORNER_POSITIONS.has(s.position)).map((space) => {
           const here = teamsByPosition[space.position] ?? [];
           if (!here.length) return null;
           const [row, col] = getGridPos(space.position);

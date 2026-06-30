@@ -26,6 +26,14 @@ const VALUE_CORRECTIONS: Array<{ position: number; rentValue: number; propertyVa
   { position: 31, rentValue: 400, propertyValue: 400 }, // Auditorium
 ];
 
+/** Fee tile rent values — $200 each, applied on every boot */
+const TAX_CORRECTIONS: Array<{ position: number; rentValue: number }> = [
+  { position:  3, rentValue: 200 }, // Co-Curricular Activity Fees
+  { position: 13, rentValue: 200 }, // School Fees
+  { position: 21, rentValue: 200 }, // ELW Trip
+  { position: 29, rentValue: 200 }, // School Supplies
+];
+
 const BOARD_CORRECTIONS: Array<{
   position: number;
   name: string;
@@ -60,6 +68,13 @@ export async function runDataMigration(): Promise<void> {
       await db
         .update(boardSpacesTable)
         .set({ rentValue: fix.rentValue, propertyValue: fix.propertyValue })
+        .where(eq(boardSpacesTable.position, fix.position));
+    }
+
+    for (const fix of TAX_CORRECTIONS) {
+      await db
+        .update(boardSpacesTable)
+        .set({ rentValue: fix.rentValue })
         .where(eq(boardSpacesTable.position, fix.position));
     }
 

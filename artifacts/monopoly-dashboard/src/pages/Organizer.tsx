@@ -1106,7 +1106,7 @@ function BoardTab() {
                         onChange={e => setEditHotel(e.target.checked)}
                         className="rounded"
                       />
-                      Has Hotel (+$100 property value, rent increases)
+                      Has Hotel (+$50 property value, rent increases)
                     </label>
                     <div className="flex gap-2">
                       <Btn variant="blue" onClick={saveEdit} disabled={setOwnership.isPending} className="flex-1">
@@ -1157,6 +1157,7 @@ function EventsTab() {
   const team  = teams?.find(t => t.id === parseInt(teamId));
   const space = board?.find(s => s.id === parseInt(spaceId));
   const propertySpaces = board?.filter(s => s.type === "property") ?? [];
+  const feeSpaces      = board?.filter(s => s.type === "tax") ?? [];
 
   const logEvent = (msg: string, type: string, amount?: number) => {
     createEvent.mutate(
@@ -1198,6 +1199,20 @@ function EventsTab() {
       {
         onSuccess: () => {
           logEvent(`${team.name} passed GO — collected $200!`, "cash_change", 200);
+          invalidate();
+        },
+      }
+    );
+  };
+
+  const handlePayFee = () => {
+    if (!team || !space) return;
+    const fee = space.rentValue ?? 200;
+    updateTeam.mutate(
+      { id: team.id, data: { cash: Math.max(0, team.cash - fee) } },
+      {
+        onSuccess: () => {
+          logEvent(`${team.name} paid $${fee} ${space.name}`, "cash_change", -fee);
           invalidate();
         },
       }
@@ -1274,14 +1289,21 @@ function EventsTab() {
             </select>
           </div>
           <div>
-            <label className={lbl}>Property (optional)</label>
+            <label className={lbl}>Property / Fee Tile (optional)</label>
             <select className={sel} value={spaceId} onChange={e => setSpaceId(e.target.value)}>
-              <option value="">Select property…</option>
-              {propertySpaces.map(s => (
-                <option key={s.id} value={s.id}>
-                  {s.name} {s.ownerId ? `(${s.ownerName})` : "(unowned)"}
-                </option>
-              ))}
+              <option value="">Select…</option>
+              <optgroup label="── Properties ──">
+                {propertySpaces.map(s => (
+                  <option key={s.id} value={s.id}>
+                    {s.name} {s.ownerId ? `(${s.ownerName})` : "(unowned)"}
+                  </option>
+                ))}
+              </optgroup>
+              <optgroup label="── Fee Tiles ──">
+                {feeSpaces.map(s => (
+                  <option key={s.id} value={s.id}>{s.name} ($200)</option>
+                ))}
+              </optgroup>
             </select>
           </div>
         </div>
@@ -1317,11 +1339,19 @@ function EventsTab() {
           </Btn>
           <Btn
             variant="red"
-            disabled={!team || !space || !space.rentValue}
+            disabled={!team || !space || space.type !== "property" || !space.rentValue}
             onClick={handlePaidRent}
             className="flex-1 py-2"
           >
             💸 Paid Rent
+          </Btn>
+          <Btn
+            variant="red"
+            disabled={!team || !space || space.type !== "tax"}
+            onClick={handlePayFee}
+            className="flex-1 py-2"
+          >
+            💰 Pay Fee ($200)
           </Btn>
           <Btn
             variant="gray"
