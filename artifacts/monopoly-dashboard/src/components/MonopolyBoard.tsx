@@ -265,10 +265,10 @@ function JailContent() {
         </span>
       </div>
 
-      {/* Bottom strip — JUST VISITING */}
+      {/* Bottom strip — JUST VISITING (height must match JAIL_STRIP_FRACTION in MonopolyBoard) */}
       <div style={{
         flexShrink: 0,
-        height: "26%",
+        height: "30%",
         backgroundColor: ORANGE,
         display: "flex", alignItems: "center", justifyContent: "center",
       }}>
@@ -584,15 +584,51 @@ export default function MonopolyBoard({ spaces, teams }: Props) {
 
           if (isSmallCorner) {
             const { left, top, width, height } = getCellBounds(row, col);
-            // pos 8 (JAIL): anchor tokens in the left side of the "Just Visiting" strip
-            // pos 0 (GO): keep centered
-            const anchorFx = pos === 8 ? 0.26 : 0.5;
-            const anchorFy = pos === 8 ? 0.88 : 0.5;
+
+            // pos 8 (JAIL / Just Visiting): pin the token container to exactly
+            // the orange strip so tokens never overlap the "IN JAIL" area.
+            // JAIL_STRIP_FRACTION must match the height: "30%" in JailContent.
+            if (pos === 8) {
+              const JAIL_STRIP_FRACTION = 0.30;
+              const stripTop    = top    + height * (1 - JAIL_STRIP_FRACTION);
+              const stripHeight = height * JAIL_STRIP_FRACTION;
+              return (
+                <div key={`tokens-${pos}`} style={{
+                  position: "absolute",
+                  left: `${left}%`, top: `${stripTop}%`,
+                  width: `${width}%`, height: `${stripHeight}%`,
+                  display: "flex", flexWrap: "wrap",
+                  alignItems: "center", justifyContent: "center",
+                  gap: "0.25cqi", overflow: "hidden",
+                  zIndex: 20,
+                }}>
+                  {here.map((team) => (
+                    <div key={team.id} title={team.name} style={{
+                      width: "2.8cqi", height: "2.8cqi",
+                      borderRadius: "50%", backgroundColor: "#fff",
+                      border: `2px solid ${NAVY}`,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      overflow: "hidden", flexShrink: 0,
+                      boxShadow: "0 1px 4px rgba(0,0,0,0.4)",
+                    }}>
+                      {isTokenImage(team.emoji) ? (
+                        <img src={team.emoji} alt={team.name} draggable={false}
+                          style={{ width: "80%", height: "80%", objectFit: "contain" }} />
+                      ) : (
+                        <span style={{ fontSize: "1.8cqi", lineHeight: 1 }}>{team.emoji}</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              );
+            }
+
+            // pos 0 (GO): centered cluster
             return (
               <div key={`tokens-${pos}`} style={{
                 position: "absolute",
-                left: `${left + width * anchorFx}%`,
-                top: `${top + height * anchorFy}%`,
+                left: `${left + width * 0.5}%`,
+                top: `${top + height * 0.5}%`,
                 transform: "translate(-50%, -50%)",
                 display: "flex", flexWrap: "wrap",
                 justifyContent: "center", alignItems: "center",
