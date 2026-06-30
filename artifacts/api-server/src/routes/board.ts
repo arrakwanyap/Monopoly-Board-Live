@@ -47,18 +47,39 @@ router.put("/board/:id/ownership", async (req, res): Promise<void> => {
     res.status(400).json({ error: parsed.error.message });
     return;
   }
-  const [space] = await db
-    .update(boardSpacesTable)
-    .set({
-      ownerId: parsed.data.ownerId ?? null,
-      hasHotel: parsed.data.hasHotel ?? false,
-    })
-    .where(eq(boardSpacesTable.id, params.data.id))
-    .returning();
-  if (!space) {
+
+  // Fetch current state so we can detect hotel transitions
+  const [current] = await db.select().from(boardSpacesTable).where(eq(boardSpacesTable.id, params.data.id));
+  if (!current) {
     res.status(404).json({ error: "Board space not found" });
     return;
   }
+
+  const wasHotel = current.hasHotel ?? false;
+  const isNowHotel = parsed.data.hasHotel ?? false;
+
+  const updateData: Partial<typeof boardSpacesTable.$inferInsert> = {
+    ownerId: parsed.data.ownerId ?? null,
+    hasHotel: isNowHotel,
+  };
+
+  // Hotel built → add $50 to both rent and displayed price
+  if (isNowHotel && !wasHotel) {
+    updateData.rentValue    = (current.rentValue    ?? 0) + 50;
+    updateData.propertyValue = (current.propertyValue ?? 0) + 50;
+  }
+  // Hotel removed → subtract $50 (e.g. correction via Board tab)
+  if (!isNowHotel && wasHotel) {
+    updateData.rentValue    = Math.max(0, (current.rentValue    ?? 0) - 50);
+    updateData.propertyValue = Math.max(0, (current.propertyValue ?? 0) - 50);
+  }
+
+  const [space] = await db
+    .update(boardSpacesTable)
+    .set(updateData)
+    .where(eq(boardSpacesTable.id, params.data.id))
+    .returning();
+
   res.json(await enrichSpace(space));
 });
 

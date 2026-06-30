@@ -74,18 +74,32 @@ function Btn({ children, onClick, disabled, variant = "blue", className = "" }: 
   variant?: "blue" | "red" | "green" | "gray" | "orange";
   className?: string;
 }) {
+  const [flash, setFlash] = useState(false);
   const colors: Record<string, string> = {
-    blue:   "bg-blue-600 text-white hover:bg-blue-700",
-    red:    "bg-red-600 text-white hover:bg-red-700",
-    green:  "bg-green-600 text-white hover:bg-green-700",
-    gray:   "bg-secondary text-foreground border border-border hover:bg-secondary/80",
-    orange: "bg-orange-500 text-white hover:bg-orange-600",
+    blue:   "bg-blue-600 text-white hover:bg-blue-500 shadow-blue-900/40",
+    red:    "bg-red-600 text-white hover:bg-red-500 shadow-red-900/40",
+    green:  "bg-green-600 text-white hover:bg-green-500 shadow-green-900/40",
+    gray:   "bg-secondary text-foreground border border-border hover:bg-secondary/80 shadow-black/20",
+    orange: "bg-orange-500 text-white hover:bg-orange-400 shadow-orange-900/40",
+  };
+  const handleClick = () => {
+    if (!onClick || disabled) return;
+    setFlash(true);
+    setTimeout(() => setFlash(false), 600);
+    onClick();
   };
   return (
     <button
-      onClick={onClick}
+      onClick={handleClick}
       disabled={disabled}
-      className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${colors[variant]} ${className}`}
+      className={`
+        relative px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider
+        shadow-md transition-all duration-100
+        active:scale-95 active:shadow-sm active:brightness-90
+        disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none
+        ${flash ? "ring-2 ring-white/70 ring-offset-1 ring-offset-transparent brightness-125" : ""}
+        ${colors[variant]} ${className}
+      `}
     >
       {children}
     </button>
@@ -1192,7 +1206,7 @@ function EventsTab() {
 
   const handlePaidRent = () => {
     if (!team || !space) return;
-    const rent = space.rentValue * (space.hasHotel ? 2 : 1);
+    const rent = space.rentValue ?? 0;
     updateTeam.mutate(
       { id: team.id, data: { cash: Math.max(0, team.cash - rent) } },
       {
