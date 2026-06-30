@@ -153,27 +153,41 @@ function TaxContent({ name, fee }: { name: string; fee?: number }) {
       width: "100%", height: "100%",
       backgroundColor: TILE_BG,
       display: "flex", flexDirection: "column",
-      alignItems: "center", justifyContent: "center",
-      gap: "0.3cqi", padding: "0.4cqi",
-      fontFamily: KABEL,
+      fontFamily: KABEL, overflow: "hidden",
     }}>
-      <span style={{ fontSize: "2.8cqi", lineHeight: 1 }}>💰</span>
-      <span style={{
-        fontSize: "0.9cqi", fontWeight: 700,
-        textAlign: "center", color: "#333",
-        lineHeight: 1.2, textTransform: "uppercase",
-        letterSpacing: "0.05em",
+      {/* Transparent placeholder matching the property colour-band height */}
+      <div style={{ height: "25%", flexShrink: 0 }} />
+
+      {/* Emoji + name */}
+      <div style={{
+        flex: 1,
+        display: "flex", flexDirection: "column",
+        alignItems: "center", justifyContent: "center",
+        gap: "0.25cqi", padding: "0.2cqi 0.3cqi",
+        textAlign: "center", overflow: "hidden",
       }}>
-        {name}
-      </span>
-      {fee != null && fee > 0 && (
+        <span style={{ fontSize: "2.4cqi", lineHeight: 1 }}>💰</span>
         <span style={{
-          fontSize: "1.1cqi", fontWeight: 900,
-          color: NAVY, marginTop: "auto",
-          letterSpacing: "0.03em",
+          fontSize: "0.95cqi", fontWeight: 700,
+          color: "#111", lineHeight: 1.2,
+          textTransform: "uppercase", letterSpacing: "0.05em",
+          wordBreak: "break-word", hyphens: "auto",
         }}>
-          ${fee}
+          {name}
         </span>
+      </div>
+
+      {/* Fee amount — mirrors the property price row */}
+      {fee != null && fee > 0 && (
+        <div style={{
+          height: "22%", flexShrink: 0,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          borderTop: `1px solid ${NAVY}33`,
+        }}>
+          <span style={{ fontSize: "1.0cqi", fontWeight: 800, color: "#111" }}>
+            ${fee}
+          </span>
+        </div>
       )}
     </div>
   );
