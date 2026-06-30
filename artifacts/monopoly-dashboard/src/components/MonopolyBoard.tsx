@@ -486,6 +486,7 @@ export default function MonopolyBoard({ spaces, teams }: Props) {
         left: `${CORNER}%`, top: `${CORNER}%`,
         width: `${100 - 2 * CORNER}%`, height: `${100 - 2 * CORNER}%`,
         pointerEvents: "none", overflow: "hidden",
+        backgroundColor: "#003087",
       }}>
         <img
           src="/board_center_new.png"
@@ -493,7 +494,7 @@ export default function MonopolyBoard({ spaces, teams }: Props) {
           draggable={false}
           style={{
             width: "100%", height: "100%",
-            objectFit: "cover", display: "block",
+            objectFit: "fill", display: "block",
             userSelect: "none", pointerEvents: "none",
           }}
         />
