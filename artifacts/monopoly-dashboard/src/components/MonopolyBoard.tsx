@@ -476,6 +476,45 @@ function CircleToken({ emoji, name, sizeCqi, borderColor = NAVY }: {
   );
 }
 
+// ── Ownership badge: house-shaped frame ─────────────────────────────────────
+// A little house silhouette (square base + pointed roof) built from two
+// stacked clip-path layers so it reads clearly as "owned property" at a
+// glance, distinct from the round team tokens used elsewhere on the board.
+const HOUSE_CLIP = "polygon(50% 0%, 100% 40%, 100% 100%, 0% 100%, 0% 40%)";
+
+function HouseToken({ emoji, name, sizeCqi, borderColor = NAVY }: {
+  emoji: string; name: string; sizeCqi: number; borderColor?: string;
+}) {
+  return (
+    <div style={{
+      width: `${sizeCqi}cqi`, height: `${sizeCqi}cqi`,
+      position: "relative", flexShrink: 0,
+      filter: "drop-shadow(0 1px 3px rgba(0,0,0,0.45))",
+    }}>
+      <div style={{
+        position: "absolute", inset: 0,
+        backgroundColor: borderColor,
+        clipPath: HOUSE_CLIP,
+      }} />
+      <div style={{
+        position: "absolute",
+        left: "12%", top: "16%", right: "12%", bottom: "6%",
+        backgroundColor: "#fff",
+        clipPath: HOUSE_CLIP,
+        display: "flex", alignItems: "center", justifyContent: "center",
+        overflow: "hidden",
+      }}>
+        {isTokenImage(emoji) ? (
+          <img src={emoji} alt={name} draggable={false}
+            style={{ width: "62%", height: "62%", objectFit: "contain", marginTop: "10%" }} />
+        ) : (
+          <span style={{ fontSize: `${sizeCqi * 0.48}cqi`, lineHeight: 1, marginTop: "10%" }}>{emoji}</span>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ── Main board ─────────────────────────────────────────────────────────────
 export default function MonopolyBoard({ spaces, teams }: Props) {
   const teamsByPosition = useMemo(() => {
@@ -565,10 +604,10 @@ export default function MonopolyBoard({ spaces, teams }: Props) {
                   top:  `${badgeTop}%`,
                   transform: "none", zIndex: 12,
                 }}>
-                <CircleToken
+                <HouseToken
                   emoji={(space as any).ownerEmoji as string}
                   name={space.ownerName ?? ""}
-                  sizeCqi={3}
+                  sizeCqi={3.6}
                   borderColor={(space as any).ownerColor ?? NAVY}
                 />
               </div>
