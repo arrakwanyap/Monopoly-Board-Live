@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { eq } from "drizzle-orm";
-import { db, teamsTable, boardSpacesTable } from "@workspace/db";
+import { db, teamsTable, boardSpacesTable, gameEventsTable } from "@workspace/db";
 import {
   CreateTeamBody,
   UpdateTeamBody,
@@ -8,6 +8,8 @@ import {
   GetTeamParams,
   DeleteTeamParams,
 } from "@workspace/api-zod";
+
+const DEFAULT_FEE = 200;
 
 const router: IRouter = Router();
 
@@ -93,15 +95,51 @@ router.patch("/teams/:id", async (req, res): Promise<void> => {
     res.status(400).json({ error: parsed.error.message });
     return;
   }
+
+  const [existing] = await db.select().from(teamsTable).where(eq(teamsTable.id, params.data.id));
+  if (!existing) {
+    res.status(404).json({ error: "Team not found" });
+    return;
+  }
+
+  const updateData = { ...parsed.data };
+  let feeSpace: { name: string; fee: number } | null = null;
+
+  // Auto-deduct the fee when a team's position lands on a fee/tax tile.
+  // This runs for every move path (manual move, chance cards, dice rolls,
+  // sendToCorner) since they all funnel through this endpoint.
+  if (typeof updateData.position === "number" && updateData.position !== existing.position) {
+    const [landedSpace] = await db
+      .select()
+      .from(boardSpacesTable)
+      .where(eq(boardSpacesTable.position, updateData.position));
+    if (landedSpace?.type === "tax") {
+      const fee = landedSpace.rentValue || DEFAULT_FEE;
+      const cashBeforeFee = updateData.cash ?? existing.cash;
+      updateData.cash = Math.max(0, cashBeforeFee - fee);
+      feeSpace = { name: landedSpace.name, fee };
+    }
+  }
+
   const [team] = await db
     .update(teamsTable)
-    .set(parsed.data)
+    .set(updateData)
     .where(eq(teamsTable.id, params.data.id))
     .returning();
   if (!team) {
     res.status(404).json({ error: "Team not found" });
     return;
   }
+
+  if (feeSpace) {
+    await db.insert(gameEventsTable).values({
+      message: `${team.name} landed on ${feeSpace.name} — automatically paid $${feeSpace.fee}`,
+      type: "cash_change",
+      teamId: team.id,
+      amount: -feeSpace.fee,
+    });
+  }
+
   const { netWorth, propertyCount } = await computeNetWorth(team.id, team.cash);
   res.json({ ...team, netWorth, propertyCount, createdAt: team.createdAt.toISOString() });
 });
