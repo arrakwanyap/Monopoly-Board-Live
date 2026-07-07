@@ -1,0 +1,31 @@
+kind = "slides"
+previewPath = "/monopoly-instructions/"
+title = "YCIS Monopoly 2026 Instructions"
+version = "1.0.0"
+id = "artifacts/monopoly-instructions"
+router = "path"
+
+[[integratedSkills]]
+name = "slides"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/monopoly-instructions/" ]
+localPort = 21079
+
+[services.development]
+run = "pnpm --filter @workspace/monopoly-instructions run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/monopoly-instructions", "run", "build" ]
+publicDir = "artifacts/monopoly-instructions/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21079"
+BASE_PATH = "/monopoly-instructions/"
