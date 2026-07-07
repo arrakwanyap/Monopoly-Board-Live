@@ -60,8 +60,8 @@ const ORANGE      = "#f7941d";
 const KABEL       = "'ITC Kabel Std', 'Nunito', sans-serif";
 
 // ── Property tile ──────────────────────────────────────────────────────────
-function PropertyContent({ name, colorGroup, price }: {
-  name: string; colorGroup: string; price: number;
+function PropertyContent({ name, colorGroup, price, rent }: {
+  name: string; colorGroup: string; price: number; rent: number;
 }) {
   const bandColor = COLOR_GROUP_HEX[colorGroup] ?? "#ccc";
 
@@ -93,14 +93,14 @@ function PropertyContent({ name, colorGroup, price }: {
         </span>
       </div>
 
-      {/* Price */}
+      {/* Rent */}
       <div style={{
         height: "22%", flexShrink: 0,
         display: "flex", alignItems: "center", justifyContent: "center",
         borderTop: `1px solid ${NAVY}33`,
       }}>
         <span style={{ fontSize: "1.0cqi", fontWeight: 800, color: "#111" }}>
-          ${price}
+          ${rent}
         </span>
       </div>
     </div>
@@ -410,6 +410,7 @@ function BoardTile({ space }: { space: BoardSpace }) {
         name={space.name}
         colorGroup={space.colorGroup}
         price={space.propertyValue}
+        rent={space.rentValue ?? 0}
       />
     );
   } else if (space.type === "chance") {
