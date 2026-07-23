@@ -1,16 +1,18 @@
-import { drizzle } from "drizzle-orm/node-postgres";
-import pg from "pg";
+import Database from "better-sqlite3";
+import { drizzle } from "drizzle-orm/better-sqlite3";
+import path from "path";
+import { fileURLToPath } from "url";
 import * as schema from "./schema";
 
-const { Pool } = pg;
+// SQLITE_FILE env var to override location; otherwise game.db at workspace root
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const dbFile = process.env.SQLITE_FILE ?? path.join(__dirname, "../../../game.db");
 
-if (!process.env.DATABASE_URL) {
-  throw new Error(
-    "DATABASE_URL must be set. Did you forget to provision a database?",
-  );
-}
+const sqlite = new Database(dbFile);
 
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-export const db = drizzle(pool, { schema });
+// WAL mode for better concurrent read performance
+sqlite.pragma("journal_mode = WAL");
+
+export const db = drizzle(sqlite, { schema });
 
 export * from "./schema";

@@ -1,15 +1,15 @@
-import { pgTable, serial, text, integer, timestamp } from "drizzle-orm/pg-core";
+import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
-export const teamsTable = pgTable("teams", {
-  id: serial("id").primaryKey(),
+export const teamsTable = sqliteTable("teams", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
   cash: integer("cash").notNull().default(1500),
   position: integer("position").notNull().default(0),
   color: text("color").notNull().default("#3b82f6"),
   emoji: text("emoji").notNull().default("🎲"),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()),
 });
 
 export const insertTeamSchema = createInsertSchema(teamsTable).omit({ id: true, createdAt: true });
