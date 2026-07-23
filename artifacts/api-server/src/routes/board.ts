@@ -122,7 +122,7 @@ router.put("/board/:id/ownership", async (req, res): Promise<void> => {
         // Monopoly broken → remove the $100 bonus
         await db
           .update(boardSpacesTable)
-          .set({ rentValue: sql`GREATEST(0, rent_value - 100)` })
+          .set({ rentValue: sql`MAX(0, rent_value - 100)` })
           .where(eq(boardSpacesTable.colorGroup, colorGroup));
       }
     }
