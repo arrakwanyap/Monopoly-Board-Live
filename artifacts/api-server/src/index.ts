@@ -1,5 +1,6 @@
 import app from "./app";
 import { logger } from "./lib/logger";
+import { seedIfEmpty } from "./lib/seed";
 import { runDataMigration } from "./lib/dataMigration";
 
 const rawPort = process.env["PORT"];
@@ -23,5 +24,5 @@ app.listen(port, (err) => {
   }
 
   logger.info({ port }, "Server listening");
-  runDataMigration();
+  seedIfEmpty().then(() => runDataMigration());
 });
