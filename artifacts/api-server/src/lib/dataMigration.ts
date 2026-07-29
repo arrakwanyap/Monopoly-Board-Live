@@ -48,7 +48,7 @@ const BOARD_CORRECTIONS: Array<{
   { position: 10, name: "Staff Canteen (1/F)"                                             },
   { position: 12, name: "Science Lab B303 (3/F)",                   colorGroup: "pink"    },
   { position: 14, name: "Art Resident Office (2/F)"                                       },
-  { position: 15, name: "Maker Space (G/F)"                                               },
+  { position: 15, name: "MSP Room: Maker Space (G/F)"                                     },
   { position: 17, name: "Innovation Hub (2/F)",                     colorGroup: "red"     },
   { position: 18, name: "Madam Tsang Chor-Hang Heritage Museum Office (1/F)"              },
   { position: 19, name: "Student Support Service (2/F)"                                   },

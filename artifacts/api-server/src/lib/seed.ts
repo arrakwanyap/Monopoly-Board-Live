@@ -24,7 +24,7 @@ const BOARD_SPACES = [
   { position: 12, name: "Science Lab B303 (3/F)",      type: "property", colorGroup: "pink",       rentValue:  90, propertyValue:  90 },
   { position: 13, name: "School Fees",               type: "tax",      colorGroup: null,          rentValue: 200, propertyValue:   0 },
   { position: 14, name: "Art Resident Office (2/F)", type: "property", colorGroup: "orange",     rentValue: 100, propertyValue: 100 },
-  { position: 15, name: "Maker Space (G/F)",         type: "property", colorGroup: "orange",     rentValue: 120, propertyValue: 120 },
+  { position: 15, name: "MSP Room: Maker Space (G/F)", type: "property", colorGroup: "orange",     rentValue: 120, propertyValue: 120 },
 
   // ── Top row (17–23) ────────────────────────────────────────────────────
   { position: 17, name: "Innovation Hub (2/F)",        type: "property", colorGroup: "red",        rentValue: 150, propertyValue: 150 },
