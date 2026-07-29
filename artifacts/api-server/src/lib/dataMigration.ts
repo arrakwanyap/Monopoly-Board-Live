@@ -39,14 +39,28 @@ const BOARD_CORRECTIONS: Array<{
   name: string;
   colorGroup?: string | null;
 }> = [
-  { position: 9,  name: "CCDD (5F)",               colorGroup: "pink"  },
-  { position: 12, name: "Science Lab B303 (3F)",    colorGroup: "pink"  },
-  { position: 17, name: "Innovation Hub (2F)",      colorGroup: "red"   },
-  { position: 21, name: "ELW Trip"                                       },
-  { position: 25, name: "Swimming Pool (4F)",       colorGroup: "green" },
-  { position: 26, name: "CUGO (5F)",                colorGroup: "green" },
-  { position: 28, name: "Lecture Hall 1 (4F)",      colorGroup: "green" },
-  { position: 29, name: "School Supplies"                                },
+  { position:  1, name: "Lost & Found Area (1/F)"                                         },
+  { position:  2, name: "Flagpole Garden (5/F)"                                           },
+  { position:  4, name: "Snack Bar (5/F)"                                                 },
+  { position:  6, name: "Nurse Office (1/F)"                                              },
+  { position:  7, name: "Back Entry Guard Booth (G/F)"                                    },
+  { position:  9, name: "CCDD (5/F)",                               colorGroup: "pink"    },
+  { position: 10, name: "Staff Canteen (1/F)"                                             },
+  { position: 12, name: "Science Lab B303 (3/F)",                   colorGroup: "pink"    },
+  { position: 14, name: "Art Resident Office (2/F)"                                       },
+  { position: 15, name: "Maker Space (G/F)"                                               },
+  { position: 17, name: "Innovation Hub (2/F)",                     colorGroup: "red"     },
+  { position: 18, name: "Madam Tsang Chor-Hang Heritage Museum Office (1/F)"              },
+  { position: 19, name: "Student Support Service (2/F)"                                   },
+  { position: 21, name: "ELW Trip"                                                        },
+  { position: 22, name: "Student Canteen (1/F)"                                           },
+  { position: 23, name: "Gymnasium (G/F)"                                                 },
+  { position: 25, name: "Swimming Pool (4/F)",                      colorGroup: "green"   },
+  { position: 26, name: "CUGO (5/F)",                               colorGroup: "green"   },
+  { position: 28, name: "Lecture Hall 1 (4/F)",                     colorGroup: "green"   },
+  { position: 29, name: "School Supplies"                                                 },
+  { position: 30, name: "Covered Playground (8/F)"                                        },
+  { position: 31, name: "Auditorium (1/F)"                                                },
 ];
 
 const TEAM_CORRECTIONS: Array<{
