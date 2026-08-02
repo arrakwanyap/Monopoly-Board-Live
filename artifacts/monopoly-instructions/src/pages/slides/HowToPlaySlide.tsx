@@ -139,7 +139,7 @@ export default function HowToPlaySlide() {
                 2.
               </div>
               <p style={{ fontSize: "1.45vw", lineHeight: 1.5, margin: 0, color: "#1B2A4A" }}>
-                Go to the real campus room on the tile and complete the challenge envelope.
+                Go to the location on the tile and complete the printed challenge.
               </p>
             </div>
           </div>
@@ -234,7 +234,7 @@ export default function HowToPlaySlide() {
               <div style={{ display: "flex", alignItems: "flex-start", gap: "0.7vw", marginBottom: "1.5vh" }}>
                 <div style={{ color: "#E8573A", fontSize: "1vw", marginTop: "0.3vh", flexShrink: 0 }}>◆</div>
                 <p style={{ fontSize: "1.4vw", lineHeight: 1.45, margin: 0, color: "#1B2A4A" }}>
-                  <span style={{ fontWeight: 600 }}>GLC (GO)</span> — collect $200 each time you pass or land.
+                  <span style={{ fontWeight: 600 }}>GLC &amp; Podium (GO)</span> — collect $200 each time you pass or land on either.
                 </p>
               </div>
               <div style={{ display: "flex", alignItems: "flex-start", gap: "0.7vw", marginBottom: "1.5vh" }}>
@@ -246,7 +246,7 @@ export default function HowToPlaySlide() {
               <div style={{ display: "flex", alignItems: "flex-start", gap: "0.7vw", marginBottom: "1.5vh" }}>
                 <div style={{ color: "#E8573A", fontSize: "1vw", marginTop: "0.3vh", flexShrink: 0 }}>◆</div>
                 <p style={{ fontSize: "1.4vw", lineHeight: 1.45, margin: 0, color: "#1B2A4A" }}>
-                  <span style={{ fontWeight: 600 }}>Chance / Chest</span> — draw a card and follow its school-themed result.
+                  <span style={{ fontWeight: 600 }}>Chance</span> — draw a card and follow its school-themed result.
                 </p>
               </div>
               <div style={{ height: "1px", backgroundColor: "rgba(27,42,74,0.2)", margin: "0.8vh 0 1.5vh" }} />

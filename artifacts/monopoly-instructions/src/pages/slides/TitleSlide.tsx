@@ -91,7 +91,7 @@ export default function TitleSlide() {
               letterSpacing: "0.04em",
             }}
           >
-            Monopoly 2026
+            Monopoly for Yew
           </h1>
 
           {/* Rule divider */}
