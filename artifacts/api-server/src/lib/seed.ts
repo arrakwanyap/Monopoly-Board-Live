@@ -54,6 +54,10 @@ const TEAMS = [
   { name: "Tiger",      color: "#8e44ad", emoji: "/team_tiger.png",      cash: 1500, position: 0 },
   { name: "Rooster",    color: "#2ecc71", emoji: "/team_rooster.png",    cash: 1500, position: 0 },
   { name: "Lion",       color: "#f1c40f", emoji: "/team_lion.png",       cash: 1500, position: 0 },
+  { name: "Horse",      color: "#f472b6", emoji: "/team_horse.png",      cash: 1500, position: 0 },
+  { name: "Rabbit",     color: "#7c6ef0", emoji: "/team_rabbit.png",     cash: 1500, position: 0 },
+  { name: "Goat",       color: "#f97316", emoji: "/team_goat.png",       cash: 1500, position: 0 },
+  { name: "Monkey",     color: "#92400e", emoji: "/team_monkey.png",     cash: 1500, position: 0 },
 ];
 
 export async function seedIfEmpty(): Promise<void> {

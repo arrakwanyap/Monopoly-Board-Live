@@ -92,6 +92,68 @@ router.get("/game/leaderboard", async (req, res): Promise<void> => {
   res.json(sorted);
 });
 
+// Property positions grouped by board side (excluding corners, chance, tax)
+const SIDE_POSITIONS = {
+  bottom: [1, 2, 4, 6, 7],
+  left:   [9, 10, 12, 14, 15],
+  top:    [17, 18, 19, 22, 23],
+  right:  [25, 26, 28, 30, 31],
+};
+
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+router.post("/game/scatter", async (req, res): Promise<void> => {
+  const teams = await db.select().from(teamsTable).orderBy(teamsTable.id);
+  if (teams.length === 0) {
+    res.status(400).json({ error: "No teams found" });
+    return;
+  }
+
+  // Shuffle teams and pick 3 random positions per side
+  const shuffledTeams = shuffle(teams);
+  const sides = [
+    shuffle(SIDE_POSITIONS.bottom).slice(0, 3),
+    shuffle(SIDE_POSITIONS.left).slice(0, 3),
+    shuffle(SIDE_POSITIONS.top).slice(0, 3),
+    shuffle(SIDE_POSITIONS.right).slice(0, 3),
+  ];
+  const allPositions = sides.flat();
+
+  const assignments: Array<{ teamId: number; teamName: string; position: number }> = [];
+
+  for (let i = 0; i < shuffledTeams.length; i++) {
+    const team = shuffledTeams[i];
+    const position = allPositions[i % allPositions.length];
+    await db.update(teamsTable).set({ position }).where(eq(teamsTable.id, team.id));
+    assignments.push({ teamId: team.id, teamName: team.name, position });
+  }
+
+  const boardSpaces = await db.select().from(boardSpacesTable);
+  const spaceName = (pos: number) => boardSpaces.find(s => s.position === pos)?.name ?? `pos ${pos}`;
+
+  await db.insert(gameEventsTable).values({
+    message: "🎲 Game started! Teams have been scattered to their starting positions.",
+    type: "system",
+  });
+
+  for (const a of assignments) {
+    await db.insert(gameEventsTable).values({
+      message: `${a.teamName} starts at ${spaceName(a.position)}`,
+      type: "system",
+      teamId: a.teamId,
+    });
+  }
+
+  res.json({ success: true, assignments: assignments.map(a => ({ ...a, spaceName: spaceName(a.position) })) });
+});
+
 router.post("/game/reset", async (req, res): Promise<void> => {
   await db.update(teamsTable).set({ cash: 1500, position: 0 });
   await db.update(boardSpacesTable).set({ ownerId: null, hasHotel: false });

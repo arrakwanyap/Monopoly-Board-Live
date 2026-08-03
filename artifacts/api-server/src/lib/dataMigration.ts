@@ -69,14 +69,21 @@ const TEAM_CORRECTIONS: Array<{
   color: string;
   emoji: string;
 }> = [
-  { id: 1, name: "Sabretooth", color: "#f5a623", emoji: "/team_sabretooth.png" },
-  { id: 2, name: "Phoenix",    color: "#e74c3c", emoji: "/team_phoenix.png"    },
-  { id: 3, name: "Unicorn",    color: "#2980b9", emoji: "/team_unicorn.png"    },
-  { id: 4, name: "Dragon",     color: "#e74c3c", emoji: "/team_dragon.png"     },
-  { id: 5, name: "Panda",      color: "#87ceeb", emoji: "/team_panda.png"      },
-  { id: 6, name: "Tiger",      color: "#8e44ad", emoji: "/team_tiger.png"      },
-  { id: 7, name: "Rooster",    color: "#2ecc71", emoji: "/team_rooster.png"    },
-  { id: 8, name: "Lion",       color: "#f1c40f", emoji: "/team_lion.png"       },
+  { id: 1,  name: "Sabretooth", color: "#f5a623", emoji: "/team_sabretooth.png" },
+  { id: 2,  name: "Phoenix",    color: "#e74c3c", emoji: "/team_phoenix.png"    },
+  { id: 3,  name: "Unicorn",    color: "#2980b9", emoji: "/team_unicorn.png"    },
+  { id: 4,  name: "Dragon",     color: "#e74c3c", emoji: "/team_dragon.png"     },
+  { id: 5,  name: "Panda",      color: "#87ceeb", emoji: "/team_panda.png"      },
+  { id: 6,  name: "Tiger",      color: "#8e44ad", emoji: "/team_tiger.png"      },
+  { id: 7,  name: "Rooster",    color: "#2ecc71", emoji: "/team_rooster.png"    },
+  { id: 8,  name: "Lion",       color: "#f1c40f", emoji: "/team_lion.png"       },
+];
+
+const NEW_TEAMS = [
+  { name: "Horse",  color: "#f472b6", emoji: "/team_horse.png",  cash: 1500, position: 0 },
+  { name: "Rabbit", color: "#7c6ef0", emoji: "/team_rabbit.png", cash: 1500, position: 0 },
+  { name: "Goat",   color: "#f97316", emoji: "/team_goat.png",   cash: 1500, position: 0 },
+  { name: "Monkey", color: "#92400e", emoji: "/team_monkey.png", cash: 1500, position: 0 },
 ];
 
 export async function runDataMigration(): Promise<void> {
@@ -109,6 +116,16 @@ export async function runDataMigration(): Promise<void> {
         .update(teamsTable)
         .set({ name: fix.name, color: fix.color, emoji: fix.emoji })
         .where(eq(teamsTable.id, fix.id));
+    }
+
+    // Insert any new teams that don't exist yet (checked by name)
+    const existing = await db.select({ name: teamsTable.name }).from(teamsTable);
+    const existingNames = new Set(existing.map(t => t.name));
+    for (const team of NEW_TEAMS) {
+      if (!existingNames.has(team.name)) {
+        await db.insert(teamsTable).values(team);
+        logger.info({ name: team.name }, "Inserted new team");
+      }
     }
 
     logger.info("Data migration complete");

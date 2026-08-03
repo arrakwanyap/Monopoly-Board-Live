@@ -1145,6 +1145,9 @@ function EventsTab() {
   const [customAmt, setCustomAmt] = useState("");
   const [confirmReset, setConfirmReset] = useState(false);
   const [drawnCard, setDrawnCard] = useState<typeof CHANCE_CARDS[number] | null>(null);
+  const [scattering, setScattering] = useState(false);
+  const [scatterResult, setScatterResult] = useState<Array<{ teamName: string; spaceName: string }> | null>(null);
+  const [confirmScatter, setConfirmScatter] = useState(false);
 
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: getListTeamsQueryKey() });
@@ -1273,6 +1276,25 @@ function EventsTab() {
   const handleReset = () => {
     if (!confirmReset) { setConfirmReset(true); return; }
     resetGame.mutate(undefined as any, { onSuccess: () => { setConfirmReset(false); invalidate(); } });
+  };
+
+  const handleScatter = async () => {
+    if (!confirmScatter) { setConfirmScatter(true); return; }
+    setScattering(true);
+    setScatterResult(null);
+    try {
+      const res = await fetch("/api/game/scatter", { method: "POST" });
+      const data = await res.json();
+      if (data.assignments) {
+        setScatterResult(data.assignments);
+        invalidate();
+      }
+    } catch (e) {
+      console.error("Scatter failed", e);
+    } finally {
+      setScattering(false);
+      setConfirmScatter(false);
+    }
   };
 
   return (
@@ -1421,18 +1443,53 @@ function EventsTab() {
       {/* Game Controls */}
       <div className={`${card} border-red-900/40`}>
         <SectionHeader title="Game Controls" />
-        <p className="text-xs text-muted-foreground mb-3">
-          Resetting clears all events, returns all teams to $1500 at GO, and removes all property ownership.
-        </p>
-        <div className="flex items-center gap-3">
-          <Btn variant={confirmReset ? "red" : "gray"} onClick={handleReset} disabled={resetGame.isPending} className="py-2 px-6">
-            {confirmReset ? "⚠ Confirm Reset" : "Reset Game"}
-          </Btn>
-          {confirmReset && (
-            <button className="text-xs text-muted-foreground underline" onClick={() => setConfirmReset(false)}>
-              Cancel
-            </button>
+
+        {/* Start Game */}
+        <div className="mb-5">
+          <p className="text-xs text-muted-foreground mb-3">
+            Scatter all 12 teams to randomised starting positions — 3 teams per side of the board.
+          </p>
+          <div className="flex items-center gap-3 flex-wrap">
+            <Btn variant={confirmScatter ? "green" : "blue"} onClick={handleScatter} disabled={scattering} className="py-2 px-6">
+              {scattering ? "Scattering…" : confirmScatter ? "⚠ Confirm Start" : "🚀 Start Game"}
+            </Btn>
+            {confirmScatter && !scattering && (
+              <button className="text-xs text-muted-foreground underline" onClick={() => setConfirmScatter(false)}>
+                Cancel
+              </button>
+            )}
+          </div>
+
+          {scatterResult && (
+            <div className="mt-3 rounded-lg border border-green-700/40 bg-green-950/20 p-3">
+              <div className="text-xs font-bold text-green-400 mb-2">✓ Teams scattered!</div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-1">
+                {scatterResult.map(a => (
+                  <div key={a.teamName} className="text-xs text-muted-foreground">
+                    <span className="font-semibold text-foreground">{a.teamName}</span>
+                    <span className="mx-1">→</span>
+                    <span>{a.spaceName}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
+        </div>
+
+        <div className="border-t border-border pt-4">
+          <p className="text-xs text-muted-foreground mb-3">
+            Resetting clears all events, returns all teams to $1500 at GO, and removes all property ownership.
+          </p>
+          <div className="flex items-center gap-3">
+            <Btn variant={confirmReset ? "red" : "gray"} onClick={handleReset} disabled={resetGame.isPending} className="py-2 px-6">
+              {confirmReset ? "⚠ Confirm Reset" : "Reset Game"}
+            </Btn>
+            {confirmReset && (
+              <button className="text-xs text-muted-foreground underline" onClick={() => setConfirmReset(false)}>
+                Cancel
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>
