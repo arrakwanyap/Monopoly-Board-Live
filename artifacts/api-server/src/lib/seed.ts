@@ -29,7 +29,7 @@ const BOARD_SPACES = [
   // ── Top row (17–23) ────────────────────────────────────────────────────
   { position: 17, name: "Innovation Hub (2/F)",        type: "property", colorGroup: "red",        rentValue: 150, propertyValue: 150 },
   { position: 18, name: "Madam Tsang Chor-Hang Heritage Museum Office (1/F)", type: "property", colorGroup: "red", rentValue: 130, propertyValue: 130 },
-  { position: 19, name: "Student Support Service (2/F)", type: "property", colorGroup: "red",   rentValue: 140, propertyValue: 140 },
+  { position: 19, name: "Student Support Services (2/F)", type: "property", colorGroup: "red",   rentValue: 140, propertyValue: 140 },
   { position: 20, name: "Chance",                   type: "chance",   colorGroup: null,          rentValue:   0, propertyValue:   0 },
   { position: 21, name: "ELW Trip",                  type: "tax",      colorGroup: null,          rentValue: 200, propertyValue:   0 },
   { position: 22, name: "Student Canteen (1/F)",        type: "property", colorGroup: "yellow",     rentValue: 160, propertyValue: 160 },

@@ -51,7 +51,7 @@ const BOARD_CORRECTIONS: Array<{
   { position: 15, name: "Maker Space (G/F)"                                                },
   { position: 17, name: "Innovation Hub (2/F)",                     colorGroup: "red"     },
   { position: 18, name: "Madam Tsang Chor-Hang Heritage Museum Office (1/F)"              },
-  { position: 19, name: "Student Support Service (2/F)"                                   },
+  { position: 19, name: "Student Support Services (2/F)"                                  },
   { position: 21, name: "ELW Trip"                                                        },
   { position: 22, name: "Student Canteen (1/F)"                                           },
   { position: 23, name: "Gymnasium (G/F)"                                                 },
