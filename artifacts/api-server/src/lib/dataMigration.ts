@@ -59,7 +59,7 @@ const BOARD_CORRECTIONS: Array<{
   { position: 26, name: "CUGO (5/F)",                               colorGroup: "green"   },
   { position: 28, name: "Lecture Hall 1 (4/F)",                     colorGroup: "green"   },
   { position: 29, name: "School Supplies"                                                 },
-  { position: 30, name: "Music Practice Rooms B417 (4/F)"                                 },
+  { position: 30, name: "Music Practice Room B412 (4/F)"                                  },
   { position: 31, name: "Auditorium (1/F)"                                                },
 ];
 
