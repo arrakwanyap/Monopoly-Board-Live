@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "cSLZKURrayMM5-63cWm11"
+uri = "file://.local/outputs/YCIS-Monopoly-2026-Instructions.pptx"
+type = "slides"
+title = "YCIS Monopoly 2026 Instructions.pptx"

@@ -101,7 +101,7 @@ router.post("/game/reset", async (req, res): Promise<void> => {
     { key: "round", value: "0" },
     { key: "status", value: "lobby" },
   ]);
-  await db.insert(gameEventsTable).values({ message: "Welcome to the Staff Monopoly Scavenger Hunt! Game has been reset. Get ready!", type: "system" });
+  await db.insert(gameEventsTable).values({ message: "Welcome to Monopoly for Yew! Game has been reset. Get ready!", type: "system" });
   res.json({ success: true, message: "Game reset to initial state" });
 });
 
