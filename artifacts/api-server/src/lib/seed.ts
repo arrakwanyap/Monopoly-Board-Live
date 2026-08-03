@@ -24,7 +24,7 @@ const BOARD_SPACES = [
   { position: 12, name: "Science Lab B303 (3/F)",      type: "property", colorGroup: "pink",       rentValue:  90, propertyValue:  90 },
   { position: 13, name: "School Fees",               type: "tax",      colorGroup: null,          rentValue: 200, propertyValue:   0 },
   { position: 14, name: "Art Resident Office (2/F)", type: "property", colorGroup: "orange",     rentValue: 100, propertyValue: 100 },
-  { position: 15, name: "MSP Room: Maker Space (G/F)", type: "property", colorGroup: "orange",     rentValue: 120, propertyValue: 120 },
+  { position: 15, name: "Maker Space (G/F)",           type: "property", colorGroup: "orange",     rentValue: 120, propertyValue: 120 },
 
   // ── Top row (17–23) ────────────────────────────────────────────────────
   { position: 17, name: "Innovation Hub (2/F)",        type: "property", colorGroup: "red",        rentValue: 150, propertyValue: 150 },
@@ -41,7 +41,7 @@ const BOARD_SPACES = [
   { position: 27, name: "Chance",                   type: "chance",   colorGroup: null,          rentValue:   0, propertyValue:   0 },
   { position: 28, name: "Lecture Hall 1 (4/F)",        type: "property", colorGroup: "green",      rentValue: 200, propertyValue: 200 },
   { position: 29, name: "School Supplies",           type: "tax",      colorGroup: null,          rentValue: 200, propertyValue:   0 },
-  { position: 30, name: "Covered Playground (8/F)",   type: "property", colorGroup: "dark_blue",  rentValue: 250, propertyValue: 250 },
+  { position: 30, name: "Music Practice Rooms B417 (4/F)", type: "property", colorGroup: "dark_blue",  rentValue: 250, propertyValue: 250 },
   { position: 31, name: "Auditorium (1/F)",           type: "property", colorGroup: "dark_blue",  rentValue: 400, propertyValue: 400 },
 ];
 
