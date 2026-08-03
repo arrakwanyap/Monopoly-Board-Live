@@ -54,7 +54,7 @@ const BOARD_CORRECTIONS: Array<{
   { position: 19, name: "Student Support Services (2/F)"                                  },
   { position: 21, name: "ELW Trip"                                                        },
   { position: 22, name: "Student Canteen (1/F)"                                           },
-  { position: 23, name: "Gymnasium (G/F)"                                                 },
+  { position: 23, name: "Rehearsal/Dancing Room (G/F)"                                    },
   { position: 25, name: "Swimming Pool (4/F)",                      colorGroup: "green"   },
   { position: 26, name: "CUGO (5/F)",                               colorGroup: "green"   },
   { position: 28, name: "Lecture Hall 1 (4/F)",                     colorGroup: "green"   },

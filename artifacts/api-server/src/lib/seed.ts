@@ -33,7 +33,7 @@ const BOARD_SPACES = [
   { position: 20, name: "Chance",                   type: "chance",   colorGroup: null,          rentValue:   0, propertyValue:   0 },
   { position: 21, name: "ELW Trip",                  type: "tax",      colorGroup: null,          rentValue: 200, propertyValue:   0 },
   { position: 22, name: "Student Canteen (1/F)",        type: "property", colorGroup: "yellow",     rentValue: 160, propertyValue: 160 },
-  { position: 23, name: "Gymnasium (G/F)",            type: "property", colorGroup: "yellow",     rentValue: 170, propertyValue: 170 },
+  { position: 23, name: "Rehearsal/Dancing Room (G/F)", type: "property", colorGroup: "yellow",     rentValue: 170, propertyValue: 170 },
 
   // ── Right column (25–31) ───────────────────────────────────────────────
   { position: 25, name: "Swimming Pool (4/F)",         type: "property", colorGroup: "green",      rentValue: 210, propertyValue: 210 },
