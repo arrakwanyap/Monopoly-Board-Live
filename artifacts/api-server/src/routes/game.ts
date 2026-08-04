@@ -34,8 +34,9 @@ router.get("/game/state", async (req, res): Promise<void> => {
     db.select().from(gameConfigTable),
   ]);
 
-  const roundConfig = configs.find(c => c.key === "round");
-  const statusConfig = configs.find(c => c.key === "status");
+  const roundConfig        = configs.find(c => c.key === "round");
+  const statusConfig       = configs.find(c => c.key === "status");
+  const announcementConfig = configs.find(c => c.key === "announcement");
 
   const teamsWithStats = await Promise.all(
     teams.map(async (t) => {
@@ -72,6 +73,7 @@ router.get("/game/state", async (req, res): Promise<void> => {
     recentEvents: eventsWithTeams,
     round: parseInt(roundConfig?.value ?? "0", 10),
     status: (statusConfig?.value ?? "lobby") as "lobby" | "active" | "finished",
+    announcement: announcementConfig?.value ?? null,
   });
 });
 
@@ -152,6 +154,31 @@ router.post("/game/scatter", async (req, res): Promise<void> => {
   }
 
   res.json({ success: true, assignments: assignments.map(a => ({ ...a, spaceName: spaceName(a.position) })) });
+});
+
+// ── Announcement endpoints ────────────────────────────────────────────────────
+
+router.get("/game/announcement", async (req, res): Promise<void> => {
+  const config = await db.select().from(gameConfigTable).where(eq(gameConfigTable.key, "announcement"));
+  res.json({ message: config[0]?.value ?? null });
+});
+
+router.post("/game/announcement", async (req, res): Promise<void> => {
+  const { message } = req.body as { message?: string };
+  if (!message?.trim()) {
+    res.status(400).json({ error: "message is required" });
+    return;
+  }
+  await db
+    .insert(gameConfigTable)
+    .values({ key: "announcement", value: message.trim() })
+    .onConflictDoUpdate({ target: gameConfigTable.key, set: { value: message.trim() } });
+  res.json({ success: true, message: message.trim() });
+});
+
+router.delete("/game/announcement", async (req, res): Promise<void> => {
+  await db.delete(gameConfigTable).where(eq(gameConfigTable.key, "announcement"));
+  res.json({ success: true });
 });
 
 router.post("/game/reset", async (req, res): Promise<void> => {

@@ -1149,6 +1149,18 @@ function EventsTab() {
   const [scatterResult, setScatterResult] = useState<Array<{ teamName: string; spaceName: string }> | null>(null);
   const [confirmScatter, setConfirmScatter] = useState(false);
 
+  // Announcements
+  const [announcementText, setAnnouncementText] = useState("");
+  const [activeAnnouncement, setActiveAnnouncement] = useState<string | null>(null);
+  const [announcementSending, setAnnouncementSending] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/game/announcement")
+      .then(r => r.json())
+      .then(d => setActiveAnnouncement(d.message ?? null))
+      .catch(() => {});
+  }, []);
+
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: getListTeamsQueryKey() });
     qc.invalidateQueries({ queryKey: getGetBoardQueryKey() });
@@ -1276,6 +1288,29 @@ function EventsTab() {
   const handleReset = () => {
     if (!confirmReset) { setConfirmReset(true); return; }
     resetGame.mutate(undefined as any, { onSuccess: () => { setConfirmReset(false); invalidate(); } });
+  };
+
+  const handleSendAnnouncement = async (msg?: string) => {
+    const text = (msg ?? announcementText).trim();
+    if (!text) return;
+    setAnnouncementSending(true);
+    try {
+      const res = await fetch("/api/game/announcement", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text }),
+      });
+      const data = await res.json();
+      if (data.success) { setActiveAnnouncement(data.message); setAnnouncementText(""); }
+    } finally { setAnnouncementSending(false); }
+  };
+
+  const handleClearAnnouncement = async () => {
+    setAnnouncementSending(true);
+    try {
+      await fetch("/api/game/announcement", { method: "DELETE" });
+      setActiveAnnouncement(null);
+    } finally { setAnnouncementSending(false); }
   };
 
   const handleScatter = async () => {
@@ -1408,6 +1443,73 @@ function EventsTab() {
             </div>
           </div>
         )}
+      </div>
+
+      {/* Announcements */}
+      <div className={`${card} border-blue-900/40`}>
+        <SectionHeader title="📢 Broadcast Announcement" />
+        <p className="text-xs text-muted-foreground mb-3">
+          Sends a full-screen pop-up to everyone viewing the board.
+        </p>
+
+        {/* Active announcement badge */}
+        {activeAnnouncement && (
+          <div className="mb-3 flex items-start gap-3 rounded-lg border border-blue-600/40 bg-blue-950/30 px-3 py-2.5">
+            <span className="text-blue-400 shrink-0 mt-0.5">📡</span>
+            <div className="flex-1 min-w-0">
+              <div className="text-xs font-bold text-blue-400 mb-0.5 uppercase tracking-wide">Live now</div>
+              <div className="text-sm text-foreground break-words">{activeAnnouncement}</div>
+            </div>
+            <button
+              onClick={handleClearAnnouncement}
+              disabled={announcementSending}
+              className="shrink-0 text-xs text-red-400 hover:text-red-300 font-bold px-2 py-1 rounded border border-red-700/40 hover:border-red-500/60 transition-colors"
+            >
+              ✕ Clear
+            </button>
+          </div>
+        )}
+
+        {/* Preset quick-send buttons */}
+        <div className="grid grid-cols-2 gap-2 mb-3">
+          {[
+            "⏰ 10 minutes remaining",
+            "⏰ 5 minutes remaining",
+            "🛑 Time's up! Please stop.",
+            "📍 Please return to the Auditorium",
+            "📍 Please return to the Podium",
+            "🎉 Game over — great job everyone!",
+          ].map(preset => (
+            <button
+              key={preset}
+              onClick={() => handleSendAnnouncement(preset)}
+              disabled={announcementSending}
+              className="text-left text-xs px-3 py-2 rounded-lg border border-border bg-card hover:border-blue-500/60 hover:text-blue-300 transition-colors text-muted-foreground font-medium"
+            >
+              {preset}
+            </button>
+          ))}
+        </div>
+
+        {/* Custom message */}
+        <div className="flex gap-2">
+          <input
+            type="text"
+            className={`${inp} flex-1`}
+            placeholder="Custom message…"
+            value={announcementText}
+            onChange={e => setAnnouncementText(e.target.value)}
+            onKeyDown={e => { if (e.key === "Enter") handleSendAnnouncement(); }}
+          />
+          <Btn
+            variant="blue"
+            onClick={() => handleSendAnnouncement()}
+            disabled={!announcementText.trim() || announcementSending}
+            className="px-4 py-2 shrink-0"
+          >
+            Send
+          </Btn>
+        </div>
       </div>
 
       {/* Custom event */}

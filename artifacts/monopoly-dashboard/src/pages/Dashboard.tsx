@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from "react";
 import { useGetGameState, useGetLeaderboard } from "@workspace/api-client-react";
 import MonopolyBoard from "@/components/MonopolyBoard";
 import LeaderboardPanel from "@/components/LeaderboardPanel";
@@ -11,6 +12,20 @@ export default function Dashboard() {
     query: { refetchInterval: 3000 },
   });
 
+  // Track previous announcement to trigger entrance animation
+  const announcement = (gameState as any)?.announcement as string | null | undefined;
+  const prevAnnouncementRef = useRef<string | null | undefined>(undefined);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    if (announcement && announcement !== prevAnnouncementRef.current) {
+      setVisible(true);
+    } else if (!announcement) {
+      setVisible(false);
+    }
+    prevAnnouncementRef.current = announcement;
+  }, [announcement]);
+
   const statusColor = {
     lobby: "#f7941d",
     active: "#2563eb",
@@ -18,7 +33,7 @@ export default function Dashboard() {
   }[gameState?.status ?? "lobby"] ?? "#7f8c8d";
 
   return (
-    <div className="h-screen bg-background flex flex-col overflow-hidden">
+    <div className="h-screen bg-background flex flex-col overflow-hidden relative">
       {/* Header */}
       <header
         className="flex items-center justify-between px-4 py-2 shrink-0"
@@ -54,6 +69,41 @@ export default function Dashboard() {
           </div>
         </div>
       </header>
+
+      {/* Announcement overlay */}
+      {visible && announcement && (
+        <div
+          className="absolute inset-0 z-50 flex items-center justify-center"
+          style={{ backgroundColor: "rgba(0,0,0,0.82)", backdropFilter: "blur(6px)" }}
+        >
+          <div
+            className="flex flex-col items-center gap-6 px-10 py-10 rounded-2xl text-center max-w-2xl w-full mx-6"
+            style={{
+              background: "linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%)",
+              border: "2px solid #3b82f6",
+              boxShadow: "0 0 60px rgba(59,130,246,0.4)",
+              animation: "popIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both",
+            }}
+          >
+            <div className="text-5xl animate-bounce">📢</div>
+            <div
+              className="font-black text-white leading-tight"
+              style={{ fontSize: "clamp(1.6rem, 4vw, 2.6rem)", textShadow: "0 2px 16px rgba(59,130,246,0.6)" }}
+            >
+              {announcement}
+            </div>
+            <div className="text-xs text-blue-300 uppercase tracking-widest font-bold">
+              — From the Organiser —
+            </div>
+          </div>
+          <style>{`
+            @keyframes popIn {
+              from { opacity: 0; transform: scale(0.7); }
+              to   { opacity: 1; transform: scale(1); }
+            }
+          `}</style>
+        </div>
+      )}
 
       {/* Main content — fills remaining height */}
       <div className="flex flex-1 min-h-0">
