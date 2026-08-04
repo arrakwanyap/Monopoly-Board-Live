@@ -43,7 +43,7 @@ const BOARD_CORRECTIONS: Array<{
   { position:  2, name: "Flagpole Garden (5/F)"                                           },
   { position:  4, name: "Snack Bar (5/F)"                                                 },
   { position:  6, name: "Medical Room (1/F)"                                               },
-  { position:  7, name: "Back Entry Guard Booth (G/F)"                                    },
+  { position:  7, name: "West Gate Security Guard Booth (G/F)"                            },
   { position:  9, name: "CCDD (5/F)",                               colorGroup: "pink"    },
   { position: 10, name: "Staff Canteen (1/F)"                                             },
   { position: 12, name: "Science Lab B303 (3/F)",                   colorGroup: "pink"    },
