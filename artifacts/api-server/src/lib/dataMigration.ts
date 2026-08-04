@@ -72,7 +72,7 @@ const TEAM_CORRECTIONS: Array<{
   { id: 1,  name: "Sabretooth", color: "#f5a623", emoji: "/team_sabretooth.png" },
   { id: 2,  name: "Phoenix",    color: "#e74c3c", emoji: "/team_phoenix.png"    },
   { id: 3,  name: "Unicorn",    color: "#2980b9", emoji: "/team_unicorn.png"    },
-  { id: 4,  name: "Dragon",     color: "#e74c3c", emoji: "/team_dragon.png"     },
+  { id: 4,  name: "Dragon",     color: "#2ecc71", emoji: "/team_dragon.png"     },
   { id: 5,  name: "Panda",      color: "#87ceeb", emoji: "/team_panda.png"      },
   { id: 6,  name: "Tiger",      color: "#8e44ad", emoji: "/team_tiger.png"      },
   { id: 7,  name: "Rooster",    color: "#2ecc71", emoji: "/team_rooster.png"    },
