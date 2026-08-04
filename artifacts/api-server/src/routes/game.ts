@@ -37,6 +37,7 @@ router.get("/game/state", async (req, res): Promise<void> => {
   const roundConfig        = configs.find(c => c.key === "round");
   const statusConfig       = configs.find(c => c.key === "status");
   const announcementConfig = configs.find(c => c.key === "announcement");
+  const timerEndConfig     = configs.find(c => c.key === "timerEnd");
 
   const teamsWithStats = await Promise.all(
     teams.map(async (t) => {
@@ -74,6 +75,7 @@ router.get("/game/state", async (req, res): Promise<void> => {
     round: parseInt(roundConfig?.value ?? "0", 10),
     status: (statusConfig?.value ?? "lobby") as "lobby" | "active" | "finished",
     announcement: announcementConfig?.value ?? null,
+    timerEnd: timerEndConfig?.value ?? null,
   });
 });
 
@@ -169,15 +171,27 @@ router.post("/game/announcement", async (req, res): Promise<void> => {
     res.status(400).json({ error: "message is required" });
     return;
   }
+  const msg = message.trim();
   await db
     .insert(gameConfigTable)
-    .values({ key: "announcement", value: message.trim() })
-    .onConflictDoUpdate({ target: gameConfigTable.key, set: { value: message.trim() } });
-  res.json({ success: true, message: message.trim() });
+    .values({ key: "announcement", value: msg })
+    .onConflictDoUpdate({ target: gameConfigTable.key, set: { value: msg } });
+
+  // When the "5 minutes remaining" message is sent, start a 5-minute countdown
+  if (/5 minutes/i.test(msg)) {
+    const timerEnd = new Date(Date.now() + 5 * 60 * 1000).toISOString();
+    await db
+      .insert(gameConfigTable)
+      .values({ key: "timerEnd", value: timerEnd })
+      .onConflictDoUpdate({ target: gameConfigTable.key, set: { value: timerEnd } });
+  }
+
+  res.json({ success: true, message: msg });
 });
 
 router.delete("/game/announcement", async (req, res): Promise<void> => {
   await db.delete(gameConfigTable).where(eq(gameConfigTable.key, "announcement"));
+  await db.delete(gameConfigTable).where(eq(gameConfigTable.key, "timerEnd"));
   res.json({ success: true });
 });
 

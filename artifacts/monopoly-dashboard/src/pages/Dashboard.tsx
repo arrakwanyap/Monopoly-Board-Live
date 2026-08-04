@@ -12,23 +12,51 @@ export default function Dashboard() {
     query: { refetchInterval: 3000 },
   });
 
-  // Track previous announcement to trigger entrance animation
   const announcement = (gameState as any)?.announcement as string | null | undefined;
+  const timerEnd     = (gameState as any)?.timerEnd     as string | null | undefined;
+
+  // ── Announcement overlay ──────────────────────────────────────────────────
+  // Overlay re-opens whenever a *new* (different) announcement arrives.
+  // The viewer can dismiss it locally with "Okay".
   const prevAnnouncementRef = useRef<string | null | undefined>(undefined);
-  const [visible, setVisible] = useState(false);
+  const [overlayVisible, setOverlayVisible] = useState(false);
 
   useEffect(() => {
     if (announcement && announcement !== prevAnnouncementRef.current) {
-      setVisible(true);
+      // New message — always show the overlay, even if previously dismissed
+      setOverlayVisible(true);
     } else if (!announcement) {
-      setVisible(false);
+      setOverlayVisible(false);
     }
     prevAnnouncementRef.current = announcement;
   }, [announcement]);
 
+  // ── Countdown timer ───────────────────────────────────────────────────────
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!timerEnd) { setTimeLeft(null); return; }
+    const calc = () => Math.max(0, new Date(timerEnd).getTime() - Date.now());
+    setTimeLeft(calc());
+    const id = setInterval(() => setTimeLeft(calc()), 500);
+    return () => clearInterval(id);
+  }, [timerEnd]);
+
+  const showTimer = timeLeft !== null;
+  const timerMins = timeLeft !== null ? Math.floor(timeLeft / 60000) : 0;
+  const timerSecs = timeLeft !== null ? Math.floor((timeLeft % 60000) / 1000) : 0;
+  const timerStr  = `${String(timerMins).padStart(2, "0")}:${String(timerSecs).padStart(2, "0")}`;
+  const timerExpired = timeLeft === 0;
+  const timerColor =
+    timerExpired           ? "#ef4444" :
+    timerMins < 1          ? "#f97316" :
+    timerMins < 3          ? "#eab308" :
+                             "#22c55e";
+
+  // ── Status colour ─────────────────────────────────────────────────────────
   const statusColor = {
-    lobby: "#f7941d",
-    active: "#2563eb",
+    lobby:    "#f7941d",
+    active:   "#2563eb",
     finished: "#ed1b24",
   }[gameState?.status ?? "lobby"] ?? "#7f8c8d";
 
@@ -57,6 +85,22 @@ export default function Dashboard() {
         </div>
 
         <div className="flex items-center gap-4">
+          {/* Floating countdown in header when timer is active */}
+          {showTimer && (
+            <div
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg border font-mono font-black text-lg"
+              style={{
+                borderColor: timerColor,
+                color: timerColor,
+                backgroundColor: `${timerColor}18`,
+                boxShadow: timerExpired ? `0 0 12px ${timerColor}88` : undefined,
+                animation: timerExpired ? "pulse 1s ease-in-out infinite" : undefined,
+              }}
+            >
+              <span style={{ fontSize: "0.9rem" }}>⏱</span>
+              <span>{timerExpired ? "TIME'S UP" : timerStr}</span>
+            </div>
+          )}
           <div className="text-right">
             <div className="text-xs text-muted-foreground uppercase tracking-widest">Status</div>
             <div className="text-sm font-bold uppercase" style={{ color: statusColor }}>
@@ -70,8 +114,8 @@ export default function Dashboard() {
         </div>
       </header>
 
-      {/* Announcement overlay */}
-      {visible && announcement && (
+      {/* Announcement overlay — dismissed locally per-viewer with "Okay" */}
+      {overlayVisible && announcement && (
         <div
           className="absolute inset-0 z-50 flex items-center justify-center"
           style={{ backgroundColor: "rgba(0,0,0,0.82)", backdropFilter: "blur(6px)" }}
@@ -95,6 +139,19 @@ export default function Dashboard() {
             <div className="text-xs text-blue-300 uppercase tracking-widest font-bold">
               — From the Organiser —
             </div>
+            <button
+              onClick={() => setOverlayVisible(false)}
+              className="mt-2 px-8 py-3 rounded-xl font-black text-base uppercase tracking-widest transition-all"
+              style={{
+                backgroundColor: "#2563eb",
+                color: "#fff",
+                boxShadow: "0 4px 20px rgba(37,99,235,0.5)",
+              }}
+              onMouseEnter={e => (e.currentTarget.style.backgroundColor = "#1d4ed8")}
+              onMouseLeave={e => (e.currentTarget.style.backgroundColor = "#2563eb")}
+            >
+              Okay
+            </button>
           </div>
           <style>{`
             @keyframes popIn {
@@ -121,7 +178,7 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* Right sidebar — exactly matches the flex row's height (= viewport - header) */}
+        {/* Right sidebar */}
         <div
           className="flex flex-col shrink-0 overflow-hidden"
           style={{
@@ -130,7 +187,7 @@ export default function Dashboard() {
             backgroundColor: "hsl(var(--card))",
           }}
         >
-          {/* Leaderboard — scrolls if it overflows */}
+          {/* Leaderboard */}
           <div
             className="shrink-0 p-3 overflow-y-auto"
             style={{ maxHeight: "55%", borderBottom: "1px solid hsl(var(--border))" }}
@@ -144,7 +201,7 @@ export default function Dashboard() {
             <LeaderboardPanel entries={leaderboard ?? []} isLoading={lbLoading} />
           </div>
 
-          {/* Live event feed — takes remaining space and scrolls */}
+          {/* Live event feed */}
           <div className="flex-1 flex flex-col min-h-0 p-3">
             <div className="flex items-center gap-2 mb-2 shrink-0">
               <div

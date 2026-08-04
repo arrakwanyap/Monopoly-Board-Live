@@ -1475,9 +1475,7 @@ function EventsTab() {
           {[
             "⏰ 10 minutes remaining",
             "⏰ 5 minutes remaining",
-            "🛑 Time's up! Please stop.",
-            "📍 Please return to the Auditorium",
-            "📍 Please return to the Podium",
+            "📍 Please return to the Gymnasium",
             "🎉 Game over — great job everyone!",
           ].map(preset => (
             <button
